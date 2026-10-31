@@ -1,0 +1,9 @@
+.git
+node_modules
+benchmarks
+test
+scripts
+*.log
+.env
+.env.*
+**/*.test.mjs

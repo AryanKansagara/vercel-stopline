@@ -6,14 +6,16 @@ This independent project is relevant to Vercel streaming applications, but it is
 
 ## Run
 
-Requirements: Node.js 22+; verified locally with Node.js 24.22.1 on Linux. There are no runtime or development dependencies. No installation, API keys, accounts, Docker, or browser is needed.
+Requirements: Node.js 22+; verified locally with Node.js 24.22.1 on Linux. There are no runtime or development dependencies. No installation, API keys, accounts, Docker, or browser is needed for CLI tests. The same-origin web application also runs directly with Node.
 
 ```sh
 node --test
 node cli.mjs compare --repeats 3 --output run.json
+npm start
+# Open http://localhost:3000
 ```
 
-`npm test` and `npm run demo` are aliases. `node cli.mjs --help` shows the CLI. The report output's parent directory must exist. All servers bind to ephemeral ports on `127.0.0.1`, and every run uses a fresh lab.
+`npm test` and `npm run demo` are aliases. `node cli.mjs --help` shows the CLI. The report output's parent directory must exist. Every experiment uses fresh internal servers bound to ephemeral loopback ports. The web application listens on `0.0.0.0`, default port 3000, configurable with `PORT`. `npm run dev` runs the same server. See [deployment.md](deployment.md) for API, bounds, operational requirements, and container instructions.
 
 ## Actual architecture
 
@@ -62,7 +64,7 @@ An absence of observed cancellation is not treated as zero cost. The fixture has
 
 ## Verification
 
-Eleven meaningful tests cover:
+The eleven original lab tests are preserved. They cover:
 
 - Normal stream completion over both HTTP connections.
 - Midstream cancellation compared against the naive policy.
@@ -76,7 +78,7 @@ Eleven meaningful tests cover:
 - A valid six-second initial-delay fixture completing after early client cancellation.
 - Invalid fixture configuration.
 
-Cleanup tests inspect actual socket close events as well as application counters. Tests avoid requiring a fixed cancellation latency or exact in-flight unit count. GitHub Actions configuration runs tests and a one-repetition CLI comparison; it has not been executed remotely as part of this local implementation.
+Cleanup tests inspect actual socket close events as well as application counters. Tests avoid requiring a fixed cancellation latency or exact in-flight unit count. Nineteen additional HTTP-server tests exercise public relay fetch aborts, negative controls, strict schema/body/path boundaries, concurrent admission, queued expiry, deadlines, retention, and actual SIGTERM cleanup. The server exposes real events and post-close metrics, rather than a fake cancellation endpoint. GitHub Actions also configures a Docker build and owned-instance HTTP smoke. This backend revision has not been deployed or remotely executed; Docker is unavailable locally.
 
 ## Why TypeScript/JavaScript semantics matter more than C++ here
 
@@ -87,9 +89,9 @@ This project tests Node HTTP, stream backpressure, and abort propagation. It doe
 1. Introduce a Vercel Node function adapter configured for documented request cancellation and compare its event timeline with the local reference contract.
 2. Add a provider adapter that records confirmed cancellation acknowledgements and returned usage without assuming a closed client request ends vendor work.
 3. Test disconnects through a real browser and deployed ingress, including buffered responses, timeout, scale-down, and cleanup behavior.
-4. Add a timeline viewer and repeated paired workloads with resource and latency distributions.
+4. Validate the same-origin timeline interface with real browser ingress and broaden repeated paired workloads with resource and latency distributions.
 
-None of those milestones is completed by the local fixture. See [RESEARCH.md](RESEARCH.md) for primary sources and product overlap.
+The local server/fixture does not establish the hosted runtime or provider milestones. See [RESEARCH.md](RESEARCH.md) for primary sources and product overlap.
 
 ## Files
 
@@ -98,3 +100,9 @@ None of those milestones is completed by the local fixture. See [RESEARCH.md](RE
 - `test/lab.test.mjs`: correctness, error, cancellation, and backpressure tests.
 - `benchmarks/local-http.json`: measured local fixture evidence.
 - `.github/workflows/test.yml`: prepared CI workflow.
+
+## Web application backend
+
+`server.mjs` serves `web/` with a same-origin API. POST strict bounded fixture options to `/api/runs`, open its single-use `streamUrl`, abort the actual browser fetch to disconnect, and poll `statusUrl` until real resource cleanup completes. The path adds one public relay to the original three-component lab; the original lab still has three components and two network hops. Two active job slots, absolute deadlines, queued expiry, a creation-rate budget, result caps, and safe static-file boundaries bound each instance. A non-root Dockerfile and graceful shutdown support a future host; no live hosting or Vercel/provider integration is implied. Full response schema, limitations and run commands are in [deployment.md](deployment.md).
+
+[benchmarks/server-http.json](benchmarks/server-http.json) records a separate four-case public-relay smoke run against an ephemeral local server: normal completion generated 12 units; cooperative propagation cancelled after one generated unit with zero later units; naive and noncooperative controls each generated all 12 with 11 after cancellation. All four post-close inventories were zero. These authored observations are timing-dependent local fixture results, not provider savings or a hosted-ingress guarantee.

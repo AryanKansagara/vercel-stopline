@@ -6,7 +6,12 @@
   "description": "Observed HTTP streaming cancellation propagation laboratory",
   "scripts": {
     "test": "node --test",
-    "demo": "node cli.mjs compare"
+    "demo": "node cli.mjs compare",
+    "start": "node server.mjs",
+    "dev": "node dev.mjs",
+    "smoke": "node scripts/http-smoke.mjs"
   },
-  "engines": { "node": ">=22" }
+  "engines": {
+    "node": ">=22"
+  }
 }
