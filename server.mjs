@@ -10,6 +10,15 @@ const ROOT = dirname(fileURLToPath(import.meta.url));
 const TERMINAL = new Set(['completed', 'cancelled', 'expired', 'failed', 'timeout', 'shutdown']);
 const FIELDS = ['policy', 'providerBehavior', 'totalUnits', 'intervalMs', 'initialDelayMs'];
 class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
+export function validatePublicOrigin(value) {
+  if (value === undefined) return null;
+  const message = 'PUBLIC_ORIGIN must be one canonical HTTPS origin without credentials, path, query, fragment or wildcard';
+  if (typeof value !== 'string' || value.length > 512) throw new Error(message);
+  let parsed; try { parsed = new URL(value); } catch { throw new Error(message); }
+  if (parsed.protocol !== 'https:' || parsed.username || parsed.password || parsed.origin !== value
+      || parsed.hostname.includes('*') || !parsed.hostname || parsed.pathname !== '/' || parsed.search || parsed.hash) throw new Error(message);
+  return value;
+}
 export function validateRun(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).length !== FIELDS.length
       || FIELDS.some(key => !Object.hasOwn(value, key))) throw new HttpError(400, 'Exactly five experiment fields are required');
@@ -42,7 +51,9 @@ async function body(request) {
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon' };
 
 export async function createApp({ host = '127.0.0.1', port = 0, webRoot = resolve(ROOT, 'web'),
-  limits = {} } = {}) {
+  publicOrigin = process.env.PUBLIC_ORIGIN, limits = {} } = {}) {
+  // Validate configuration before creating any listener or job resources.
+  const allowedPublicOrigin = validatePublicOrigin(publicOrigin);
   // Overrides are for deterministic local tests only, and cannot relax production ceilings.
   const settings = { active: 2, retained: 20, queuedMs: 5000, deadlineMs: 12000, retentionMs: 60000, createsPerMinute: 12, ...limits };
   for (const [key, max] of Object.entries({ active: 2, retained: 20, queuedMs: 5000, deadlineMs: 12000, retentionMs: 60000, createsPerMinute: 12 })) {
@@ -186,7 +197,10 @@ export async function createApp({ host = '127.0.0.1', port = 0, webRoot = resolv
       if (rawPath === '/api/runs') {
         if (request.method !== 'POST') throw new HttpError(405, 'POST required');
         if (!accepting) throw new HttpError(503, 'Server is shutting down');
-        if (request.headers.origin && request.headers.origin !== `http://${request.headers.host}` && request.headers.origin !== `https://${request.headers.host}`) throw new HttpError(403, 'Same-origin request required');
+        // Origin is compared exactly; forwarded host/proto headers never expand this allowlist.
+        if (request.headers.origin && request.headers.origin !== allowedPublicOrigin
+            && request.headers.origin !== `http://${request.headers.host}`
+            && request.headers.origin !== `https://${request.headers.host}`) throw new HttpError(403, 'Same-origin or configured public origin required');
         const now = Date.now();
         tokens = Math.min(settings.createsPerMinute, tokens + (now - refilledAt) * settings.createsPerMinute / 60000); refilledAt = now;
         if (tokens < 1) throw new HttpError(429, 'Creation rate budget exhausted');

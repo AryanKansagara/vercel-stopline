@@ -81,4 +81,25 @@ The official Node image and supported Node 24 release line were checked against 
 - https://github.com/nodejs/docker-node
 - https://nodejs.org/en/download
 
-Docker is unavailable in the implementation environment. Container build/health/non-root/HTTP smoke are configured as a distinct GitHub Actions job; no local image-build result or new remote CI pass is claimed. `scripts/http-smoke.mjs` runs four actual HTTP cases against an owned instance: normal completion, cooperative abort, naive continuation, and noncooperative continuation, verifying post-close resource inventories. Existing CLI evidence remains separate from this application check.
+Docker is unavailable in the implementation environment. The earlier application publication at remote `ec8dfc2` passed the Docker build/HTTP smoke/health/non-root checks in [GitHub Actions run 41245698790](https://github.com/AryanKansagara/vercel-stopline/actions/runs/41245698790). That evidence does not validate Railway or Vercel hosting, and subsequent configuration changes need their own CI run. `scripts/http-smoke.mjs` runs four actual HTTP cases against an owned instance: normal completion, cooperative abort, naive continuation, and noncooperative continuation, verifying post-close resource inventories. Existing CLI evidence remains separate from this application check.
+
+
+## Vercel static frontend and Railway backend
+
+`railway.json` selects the repository Dockerfile, `/readyz`, one replica, bounded failure restarts, zero rollout overlap and a 15-second SIGTERM drain allowance. Configure Railway from the repository root; keep its assigned `PORT`, use one region/replica, and leave the Dockerfile start command intact. Jobs live only in process memory: deployment cutover/restart can interrupt an active experiment or discard its result. No volume or external database is required. Railway's deployment healthcheck gates startup; it does not establish browser disconnect propagation or continuous monitoring.
+
+Set Railway `PUBLIC_ORIGIN` to the **actual canonical HTTPS origin of the Vercel frontend**. It is optional for direct same-origin hosting, but a mismatching proxied browser Origin is rejected when it is absent. Examples in test fixtures are not deployment addresses. The backend validates this value before opening any listener. It must be one HTTPS origin: no trailing slash, credentials, path, query, fragment, comma-separated list, wildcard, implicit normalization or default `:443` suffix. Exact Origin comparison permits only this configured origin in addition to the request's direct HTTP/HTTPS Host. `Forwarded`, `X-Forwarded-Host` and `X-Forwarded-Proto` never expand the allowlist. Requests without Origin (CLI/server clients) still work. This is request-origin checking, not authentication or a CORS gateway; no wildcard/access-control response headers or preflight bypass are added.
+
+On Vercel, set `BACKEND_ORIGIN` to the **actual deployed canonical HTTPS Railway origin**, then deploy from the repository root with its programmatic `vercel.ts`. Missing or invalid backend origin fails configuration loading. Its build command copies only six public frontend assets (including the theme stylesheet/controller) into `dist`; server code, tests and reports are excluded. Vercel serves those assets and rewrites `/api/:path*`, `/healthz`, and `/readyz` to the configured backend while preserving their paths. The browser keeps relative API URLs and its real streaming fetch/AbortController; no browser-visible backend address, mock response or static-only success fallback replaces it. Do not commit a guessed backend URL or add a competing `vercel.json`.
+
+The rewrite uses no response-body adapter. Keep the backend's streaming headers (`text/plain`, `no-store, no-transform`, `X-Accel-Buffering: no`) and Vercel's no-store response configuration; do not enable external-origin CDN caching for job/status/stream routes. These choices express streaming intent, **not evidence that an external proxy forwards disconnects**. After both real hosts are connected, run the four-case HTTP smoke against the direct backend and Vercel origin, then verify in a real browser that units arrive incrementally, AbortController cancellation produces observed provider events, both continuation controls remain distinct, and final resource counts settle. Check header/Origin behavior on the exact production domain: a different Vercel preview URL is not implicitly trusted. If either ingress buffers or keeps the origin request alive after disconnect, report that behavior as unverified/failed and correct the routing before claiming cancellation propagation.
+
+These files prepare the split-host topology; account connections, domains, deployed URLs and public-host streaming validation remain pending. No service has been created by this configuration change.
+
+Primary configuration references checked on 2026-10-31:
+
+- https://docs.railway.com/config-as-code/reference
+- https://railway.com/railway.schema.json
+- https://docs.railway.com/deployments/healthchecks
+- https://vercel.com/docs/project-configuration/vercel-ts
+- https://vercel.com/docs/routing/rewrites

@@ -2,3 +2,4 @@ node_modules/
 run.json
 *.log
 .env*
+/dist/

@@ -78,7 +78,7 @@ The eleven original lab tests are preserved. They cover:
 - A valid six-second initial-delay fixture completing after early client cancellation.
 - Invalid fixture configuration.
 
-Cleanup tests inspect actual socket close events as well as application counters. Tests avoid requiring a fixed cancellation latency or exact in-flight unit count. Nineteen additional HTTP-server tests exercise public relay fetch aborts, negative controls, strict schema/body/path boundaries, concurrent admission, queued expiry, deadlines, retention, and actual SIGTERM cleanup. The server exposes real events and post-close metrics, rather than a fake cancellation endpoint. GitHub Actions also configures a Docker build and owned-instance HTTP smoke. This backend revision has not been deployed or remotely executed; Docker is unavailable locally.
+Cleanup tests inspect actual socket close events as well as application counters. Tests avoid requiring a fixed cancellation latency or exact in-flight unit count. Twenty-one additional HTTP-server tests exercise public relay fetch aborts, negative controls, strict schema/body/path boundaries, concurrent admission, queued expiry, deadlines, retention, and actual SIGTERM cleanup. The server exposes real events and post-close metrics, rather than a fake cancellation endpoint. GitHub Actions also configures a Docker build and owned-instance HTTP smoke. This backend revision has not been deployed or remotely executed; Docker is unavailable locally.
 
 ## Why TypeScript/JavaScript semantics matter more than C++ here
 
