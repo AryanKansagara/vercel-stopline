@@ -13,7 +13,7 @@ async function fixture(t, extra = {}) {
   const webRoot = await mkdtemp(join(tmpdir(), 'stopline-web-'));
   await writeFile(join(webRoot, 'index.html'), '<!doctype html><h1>StopLine fixture</h1>');
   await writeFile(join(webRoot, 'app.js'), 'console.log("fixture");');
-  const app = await createApp({ webRoot, ...extra });
+  const app = await createApp({ webRoot, dataDir: join(webRoot, "data"), ...extra });
   t.after(async () => { await app.close(); await rm(webRoot, { recursive: true, force: true }); });
   return { app, webRoot };
 }
