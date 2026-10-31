@@ -12,3 +12,22 @@ jobs:
           node-version: 24
       - run: npm test
       - run: node cli.mjs compare --repeats 1
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: docker build -t stopline-ci .
+      - run: docker run -d --name stopline-ci -p 127.0.0.1:3000:3000 stopline-ci
+      - run: node scripts/http-smoke.mjs
+      - name: Container health and non-root identity
+        run: |
+          test "$(docker exec stopline-ci id -u)" != "0"
+          docker exec stopline-ci node -e "fetch('http://127.0.0.1:3000/readyz').then(r=>process.exit(r.ok?0:1))"
+      - name: Stop container
+        if: always()
+        run: |
+          docker logs stopline-ci || true
+          docker stop --time 5 stopline-ci || true
