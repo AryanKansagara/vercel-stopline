@@ -3,3 +3,6 @@ run.json
 *.log
 .env*
 /dist/
+
+.data/
+*.sqlite*

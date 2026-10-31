@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Observed HTTP streaming cancellation propagation laboratory",
+  "description": "Private streaming endpoint cancellation profiler",
   "scripts": {
     "test": "node --test",
     "demo": "node cli.mjs compare",
-    "start": "node server.mjs",
+    "start": "node launch.mjs",
     "dev": "node dev.mjs",
     "smoke": "node scripts/http-smoke.mjs"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   }
 }

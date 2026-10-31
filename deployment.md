@@ -1,107 +1,70 @@
-# StopLine deployment contract
+# Deployment and API
 
-This repository now includes a runnable Node HTTP application and same-origin interface. The recorded Vercel-to-Railway browser controls validate hosted cancellation for deployment `dpl_Bb2BSLNPRt5T2YxtCL9oXX8gg4Zf` on 2026-10-31; broader ingress conditions and vendor inference/billing remain unverified. Every experiment uses the actual local HTTP lab and an authored generator. There is no external provider address, credential, model or bill.
+## Runtime and durable storage
 
-## Start and verify
+Use official `node:24-bookworm-slim`, one Railway Docker replica, the repository `Dockerfile`, assigned `PORT`, and `/readyz` healthcheck. `railway.json` has zero rollout overlap: **never run two processes against this SQLite directory**. Attach a durable volume at `/data` and configure:
 
-Use Node 24 (supported LTS line), no npm installation or packages:
-
-```sh
-npm test
-PORT=3000 npm start
-# In another terminal, against this instance only:
-BASE_URL=http://127.0.0.1:3000 npm run smoke
+```text
+DATA_DIR=/data/stopline
+RAILWAY_RUN_UID=0
+DROP_PRIVILEGES=1
+PUBLIC_ORIGIN=https://vercel-stopline.vercel.app
 ```
 
-`npm run dev` uses `dev.mjs` to start the same server and accepts preview arguments `--host 0.0.0.0 --port 4173 --strictPort`. It always fails if the chosen port is occupied. The production start command uses `PORT` for the application listener; default 3000, bind `0.0.0.0`. Port zero is accepted for local process tests and the startup JSON prints the selected loopback URL. The two internal lab servers always use fresh ephemeral loopback ports. Send SIGTERM/SIGINT to stop admission, force remaining experiments to settle, close application sockets and stop the listener. The production command is `node server.mjs`, without a watch process or build step.
+Railway mounts can initially be root-owned. `launch.mjs` refuses to serve HTTP as root without explicit privilege-drop configuration. It opens directories with `O_DIRECTORY|O_NOFOLLOW`, rejects symlinks, gives `/data` traverse permission 0711 and initializes only the configured DATA_DIR itself (0700, UID/GID1000); existing intermediate directories are checked but not chowned, without recursively changing user files. It clears supplementary groups and sets GID/UID1000 **before importing the server**. Any failure exits closed. The default Docker image remains `USER node`; its precreated `/data/stopline` needs no elevated startup without a volume. Configured unwritable, symlinked or invalid storage fails startup; there is no temporary-directory fallback. `/readyz` cannot pass if database initialization failed. Local development uses `npm run dev`, not the production root-refusing launch wrapper.
 
-`GET /healthz` indicates the HTTP process is reachable. `GET /readyz` returns 200 with `{ready:true,activeJobs,retainedJobs}` when accepting requests and `web/index.html` is a regular file inside the real static boundary, within the 2 MiB ceiling; unavailable assets/shutdown return 503. No secret or absolute file path is exposed by errors.
+SQLite uses foreign keys, prepared statements, WAL, secure_delete, a 32768-page ceiling at 4096-byte pages (~128 MiB), a 128-page auto-checkpoint and an 8 MiB retained-journal target. No long-lived read transactions are kept. The journal target is a post-checkpoint target, not an independent hard instantaneous filesystem quota. Reserve a volume larger than the database plus WAL/SQLite overhead. Deletions remove logical records and secure_delete overwrites freed database content; this is not a guarantee about host snapshots or forensic erasure. Set a hosting volume quota as a second bound. Capacity exhaustion returns 507 where detected, blocks new persistence and terminates affected runs safely. Back up/restore the directory only using a SQLite-aware procedure or stopped service.
 
-## Same-origin API
+On restart unfinished saved runs become terminal `interrupted`; completed history and workspace token hashes survive. In-flight streams cannot resume. Shutdown stops admission, awaits pending DNS validation, closes actual upstream requests/timers and the HTTP server, checkpoints and closes SQLite. Preserve the volume across releases.
 
-POST `/api/runs` with Content-Type `application/json` (optional `charset=utf-8`). Exactly these five fields are required; unknown/missing fields, strings for numbers, unsupported values and invalid JSON are rejected:
-
-```json
-{"policy":"propagate","providerBehavior":"cooperative","totalUnits":12,"intervalMs":25,"initialDelayMs":50}
-```
-
-| Field | Allowed |
-| --- | --- |
-| policy | `naive`, `propagate` |
-| providerBehavior | `cooperative`, `noncooperative` |
-| totalUnits | integer 1–60 |
-| intervalMs | integer 10–150 |
-| initialDelayMs | integer 0–500 |
-
-Response 201: `{id,streamUrl,statusUrl}`, where the two URLs are relative same-origin paths. GET `streamUrl` exactly once to start. The actual response is `text/plain; charset=utf-8`: lines `1:xxxxxxxx...\n`, with a numbered unit and 32 fixture `x` characters. This is not NDJSON. Read chunks with a streaming UTF-8 decoder, preserving incomplete lines. `AbortController.abort()` on that fetch closes the public relay socket; the relay destroys its real outgoing HTTP request to the lab proxy, which applies the selected abort policy to its own provider request. There is no cancel endpoint or synthetic provider-cancel counter.
-
-GET `statusUrl` to poll `{id,status,terminal,configuration,metrics,events,cleanup,error,createdAt,cleanupForced,notice}`. Events are actual lab records `{sequence,atMs,kind,provenance:"observed",unit?}`. Metrics are `null` before initialization, otherwise a live lab snapshot; fields include `providerUnits`, `providerUnitsAfterCancel`, `propagatedAborts`, `providerCancellationObserved`, `clientCancelAtMs`, `activeTimers`, `activeProviderJobs`, `activeProxyRequests`, `openSockets`, and `listeningServers`.
-
-| Status | Meaning |
-| --- | --- |
-| queued | Reserved a slot; stream not opened |
-| running | Initializing or streaming actual HTTP |
-| settling | Client ended/disconnected; awaiting real work settlement and server cleanup |
-| completed | Full stream completed and resources settled |
-| cancelled | Public client disconnected and resources settled |
-| expired | Unopened job expired |
-| timeout | Absolute job deadline forced cleanup |
-| failed | Startup, upstream or resource error |
-| shutdown | Server shutdown forced cleanup |
-
-Poll until `terminal:true`. `cancelled` does not imply the provider stopped early: inspect actual work and events. In the naive and noncooperative controls, settling continues while scheduled generator work actually completes. `cleanup` is a post-close snapshot, or null if no lab was started; terminal lab runs have zero tracked timers, provider jobs, proxy requests, sockets and listening lab servers. Public listener sockets are separately owned by the server and remain available for polling.
-
-`cleanupForced:true` identifies administrative cleanup (deadline/shutdown/expiry/startup cleanup). Such outcomes do not establish policy efficacy, even if shutdown records a provider cancellation. `error` contains safe fixed text, never internal addresses or exception dumps. Error responses are `{error:string}` with 400 schema/JSON, 403 foreign Origin, 404 missing/evicted ID, 405 method, 409 stream already claimed, 413 body size, 415 content type, 429 limits, 503 unavailable/admission stopped. A slow body receives a bounded 408/closed connection.
-
-## Resource and retention limits
-
-- Two active slots per process, including queued/running/settling jobs. Capacity is rechecked after asynchronous body parsing, preventing simultaneous POSTs from exceeding it.
-- An instance-wide token bucket allows 12 creation attempts per minute (initial burst 12). Malformed creations also consume tokens. There is no per-user fairness or distributed rate limiter.
-- At most 8,192 body bytes and 8,192 header bytes; request-body deadline two seconds, Node headers/request timeout five seconds. Chunked and Content-Length bodies are both bounded.
-- Unopened jobs expire five seconds after POST. All jobs have an absolute 12-second deadline from POST, including time spent queued. Opening very late can leave too little time for a maximum-length run and produce timeout; choose smaller examples or open immediately.
-- At most 20 retained results. Terminal results expire after 60 seconds and are lazily removed on later API/static requests. Oldest terminal records can be evicted earlier under the cap; active records are never evicted. Results are in-memory and disappear on process restart.
-- Static serving is limited to real regular files under `web/`, with supported extensions and a 2 MiB ceiling, excluding traversal and symlink escapes. No arbitrary source file/directory browsing or external fetch destination exists. CSP permits same-origin scripts/styles/connects and rejects inline scripts and frames.
-
-This is one process with in-memory job IDs and no public account system. Host a single replica or use sticky routing; polling another replica cannot recover a job. For an internet launch, place it behind an ingress with TLS, response buffering disabled, streaming support, connection/rate limits and a request timeout exceeding the 12-second job lifetime. Validate actual disconnect propagation through that ingress. The global slot/rate limit is deliberately shared and can reject traffic during a demonstration; it is not a multi-tenant service or authentication boundary. No hosting is enabled by these files.
-
-## Container
+## Container validation
 
 ```sh
 docker build -t stopline .
-docker run --rm --name stopline -p 127.0.0.1:3000:3000 stopline
-# Another terminal:
-BASE_URL=http://127.0.0.1:3000 node scripts/http-smoke.mjs
+docker run --rm --name stopline --tmpfs /data/stopline:rw,noexec,nosuid,uid=1000,gid=1000,mode=0700 -p 127.0.0.1:3000:3000 stopline
+# In another terminal:
+node scripts/http-smoke.mjs
+node scripts/product-smoke.mjs
 ```
 
-The Dockerfile uses official `node:24-bookworm-slim`, runs as existing non-root `node`, copies only runtime files/assets, exposes port 3000, and probes `/readyz` with a Node-based HEALTHCHECK. No package download, shell entrypoint or root runtime is needed. Set a fixed nonzero PORT for container HEALTHCHECK; PORT=0 is for the host-side test entrypoint. The floating 24 tag intentionally tracks supported-line patches; it is not a reproducible digest pin. Resolve and pin an approved digest in your deployment release process.
+The tmpfs is disposable CI storage, not the production persistence configuration. For durable local Docker testing mount an appropriately owned named volume. CI checks the real HTTP lab controls, authenticated product operations, SSRF rejection, readiness and nonroot identity. Docker is unavailable in the implementation sandbox. This sandbox also denies chown to UID1000 (`EINVAL`); the positive root-drop startup test explicitly skips only when this capability is unavailable, while failure-closed startup still runs. The positive startup/restart test runs when the test host is root and ownership mapping is available; Docker CI separately starts a root-owned tmpfs volume, initializes it, and verifies the HTTP process UID1000. No current product container/hosting success is inferred from older lab CI.
 
-The official Node image and supported Node 24 release line were checked against primary sources on 2026-10-31:
+## Vercel
 
-- https://hub.docker.com/_/node
-- https://github.com/nodejs/docker-node
-- https://nodejs.org/en/download
+`vercel.json` builds `node scripts/build-frontend.mjs` into public static `dist`. Destinations are the deployed Railway origin `https://stopline-production-05c5.up.railway.app` in both fixed-origin Node adapters and legacy/health rewrites. No dynamic user-controlled backend URL is accepted. A backend-domain change requires updating all these literal targets together.
 
-Docker is unavailable in the implementation environment. The earlier application publication at remote `ec8dfc2` passed the Docker build/HTTP smoke/health/non-root checks in [GitHub Actions run 41245698790](https://github.com/AryanKansagara/vercel-stopline/actions/runs/41245698790). That evidence does not validate Railway or Vercel hosting, and subsequent configuration changes need their own CI run. `scripts/http-smoke.mjs` runs four actual HTTP cases against an owned instance: normal completion, cooperative abort, naive continuation, and noncooperative continuation, verifying post-close resource inventories. Existing CLI evidence remains separate from this application check.
+Authenticated workspace/history/create/export/delete routes go through native `api/product.mjs`, which validates the route/method/UUID, body limit and bearer shape, forwards the incoming cancellation signal, and returns safe errors. The more-specific product stream rewrite precedes metadata and generic routes. `api/stream.mjs` supports both legacy and product selectors, authenticates product streams, forwards only the workspace Authorization, passes `request.signal` to the fixed backend fetch and returns the live readable body without buffering. Both functions set `supportsCancellation:true,maxDuration:30`; the backend stream cap is 15 seconds. Standalone functions export `default {fetch:handler}`.
 
+`PUBLIC_ORIGIN` permits exactly the configured canonical HTTPS origin alongside direct Host-derived same origin. Forwarded headers never expand it. No wildcard CORS headers or cookies are used. Bearer authentication is still required independently. Other Vercel preview domains are not implicitly permitted for mutations. All API responses use no-store/no-transform, and the UI has same-origin CSP, external scripts/styles and no inline code.
 
-## Vercel static frontend and Railway backend
+Validate the **actual new deployment** in a browser: generic GET completion, threshold/manual cancellation with both policies, an authorized OpenAI-compatible wire test, history/export/delete, volume restart durability and cross-workspace refusal. Check that actual client-cancel events reach Railway through Vercel and distinguish socket abort from provider work/billing. Prior lab hosted controls are historical evidence only. Root owns deployment and release approval; this source update alone does not change hosting.
 
-`railway.json` selects the repository Dockerfile, `/readyz`, one replica, bounded failure restarts, zero rollout overlap and a 15-second SIGTERM drain allowance. Configure Railway from the repository root; keep its assigned `PORT`, use one region/replica, and leave the Dockerfile start command intact. Jobs live only in process memory: deployment cutover/restart can interrupt an active experiment or discard its result. No volume or external database is required. Railway's deployment healthcheck gates startup; it does not establish browser disconnect propagation or continuous monitoring.
+## Product API
 
-Set Railway `PUBLIC_ORIGIN` to the **actual canonical HTTPS origin of the Vercel frontend**. It is optional for direct same-origin hosting, but a mismatching proxied browser Origin is rejected when it is absent. Examples in test fixtures are not deployment addresses. The backend validates this value before opening any listener. It must be one HTTPS origin: no trailing slash, credentials, path, query, fragment, comma-separated list, wildcard, implicit normalization or default `:443` suffix. Exact Origin comparison permits only this configured origin in addition to the request's direct HTTP/HTTPS Host. `Forwarded`, `X-Forwarded-Host` and `X-Forwarded-Proto` never expand the allowlist. Requests without Origin (CLI/server clients) still work. This is request-origin checking, not authentication or a CORS gateway; no wildcard/access-control response headers or preflight bypass are added.
+JSON responses/errors use no-store. `POST /api/workspaces` with `{}` returns 201 `{token,workspace:{createdAt}}`. All other product routes require `Authorization: Bearer <64 lowercase hex characters>`; only the hash is persisted. The token is returned once. The bearer grants all workspace actions; there is no password recovery or separate permission model.
 
-Deploy the Vercel frontend from the repository root using the static `vercel.json`. Its literal rewrite destination is the deployed Railway backend, `https://stopline-production-05c5.up.railway.app`; `BACKEND_ORIGIN` is no longer required. The previous programmatic `vercel.ts` was rejected by the deployment API with a missing rewrite-destination error and has been removed, so there is only one Vercel configuration file. The build command remains `node scripts/build-frontend.mjs`, with output `dist` containing only six public frontend assets (including the theme stylesheet/controller); server code, tests and reports are excluded. Vercel serves those assets. Its first rewrite sends `/api/runs/:runId/stream` to the local `/api/stream?runId=:runId` Node function. Remaining `/api/:path*`, `/healthz`, and `/readyz` requests use literal external Railway rewrites with their paths preserved. The browser keeps relative API URLs and its real streaming fetch/AbortController. Railway `PUBLIC_ORIGIN` is configured as `https://vercel-stopline.vercel.app`; a backend-domain change requires updating the static rewrite destinations and rebuilding the frontend.
+`POST /api/profile-runs` requires exactly:
 
-The stream route uses `api/stream.mjs`, a standalone Node Web handler exported as `default {fetch: GET}` with a named GET for tests. It validates exactly one UUID runId, selects only the fixed canonical HTTPS backend, rejects extra URL parameters, disables redirects, passes `request.signal` into upstream fetch, and returns the live response body without reading/buffering it. `vercel.json` opts this function into `supportsCancellation: true` with a 30-second duration; the backend retains its own stricter 12-second job lifetime. No `waitUntil` or background continuation bypasses cancellation. Keep the backend's streaming headers (`text/plain`, `no-store, no-transform`, `X-Accel-Buffering: no`) and Vercel's no-store response configuration; do not enable external-origin CDN caching for job/status/stream routes. Initial live QA of the plain external rewrite aborted the browser after two lines but the origin completed all 48 authored units, recorded zero propagated aborts and no client-cancel event. That demonstrated that the plain rewrite did not forward disconnects in that test. The cancellation-aware Node function replaces that stream path; local tests prove its signal-to-real-HTTP wiring and preserve both continuation controls, **not delivery of a Vercel platform cancellation event**. For future deployments, run the four-case HTTP smoke against the direct backend and Vercel origin, then verify in a real browser that units arrive incrementally, AbortController cancellation produces observed provider events, both continuation controls remain distinct, and final resource counts settle. Check header/Origin behavior on the exact production domain: a different Vercel preview URL is not implicitly trusted. If either ingress buffers or keeps the origin request alive after disconnect, report that behavior as unverified/failed and correct the routing before claiming cancellation propagation.
+```json
+{"mode":"get","endpoint":"https://your-public-host/stream?count=10","policy":"propagate","cancelAfterChunks":3,"cancelAfterMs":2000}
+```
 
-The Railway backend address and Vercel frontend origin above are deployment targets supplied during deployment coordination. The dedicated function subsequently passed three actual hosted browser cancellation controls on `https://vercel-stopline.vercel.app/`: cooperative propagation stopped with zero post-cancel units, while naive and noncooperative controls continued with 37 and 42 post-cancel units respectively. Every run settled with zero tracked resources and no forced cleanup. See README for the exact deployment/configuration/counts. These observations do not replace validation of subsequent releases or imply that static configuration parsing alone verifies streaming. This repository configuration change does not create or manage hosting services.
+`policy` is `propagate` or `observe`. `cancelAfterChunks` is null or integer1..100; `cancelAfterMs` null or integer250..10000; at least one must be nonnull. These are saved browser instructions, not a fake server cancellation trigger. The first actual browser threshold aborts its streaming fetch.
 
-Primary configuration references checked on 2026-10-31:
+OpenAI mode uses `mode:"openai"`, full HTTPS URL ending `/v1/chat/completions`, plus exactly `model` (1..120 printable chars), `prompt` (1..4000 chars), `maxTokens` (1..128), and `apiKey` (1..4096 nonwhitespace ASCII). The key is mandatory; no server-provided paid credentials exist. Request body is bounded to32768 bytes; both prompt/key are excluded from reports, which retain `promptLength`, model and maxTokens. Unknown fields are rejected.
 
-- https://docs.railway.com/config-as-code/reference
-- https://railway.com/railway.schema.json
-- https://docs.railway.com/deployments/healthchecks
-- https://vercel.com/docs/project-configuration/vercel-json
-- https://vercel.com/docs/routing/rewrites
-- https://vercel.com/docs/functions/functions-api-reference
-- https://vercel.com/docs/functions/runtimes/node-js
+Creation resolves/validates DNS then returns201 `{id,streamUrl,statusUrl}`. `GET streamUrl` is a single-use live text stream. The browser must send the bearer here too and actually abort the fetch to cancel. `GET statusUrl` returns the direct report; use a separate signal for polling after cancellation. `GET /api/profile-runs` returns `{runs,count}` newest-first, omitting event arrays. `GET /api/profile-runs/:id/export` returns the direct full report with download disposition. `DELETE /api/profile-runs/:id` stops/deletes that run; `DELETE /api/workspaces/current` stops all owned runs and deletes token/history. Both return204. Another workspace receives404 for a known foreign run ID.
+
+Reports contain `id,status,terminal,createdAt,startedAt?,completedAt?,configuration,metrics,events,error,cleanup,stopReason?,observability`. Terminal statuses are completed,cancelled,timeout,error,interrupted; queued,running,settling are nonterminal. Metrics: `ttfbMs,headersMs,bytesReceived,chunksReceived,bytesAfterCancel,chunksAfterCancel,clientCancelledAtMs,upstreamAbortRequested,upstreamAborted,upstreamClosed,upstreamEnded,durationMs,upstreamStatus`. Unknown latencies/cancel time are null. Events have increasing `sequence`, relative monotonic `atMs`, fixed `kind`, optional numeric metadata, never response text. Chunk events are sampled to the first32 to bound history. `cleanup` reports owned activeRequest and activeTimers. Provider compute/billing are always `not observable`.
+
+## Limits and outbound boundary
+
+Two combined active product/lab slots; queued product expiry10s; active stream15s;1MiB response;4096 chunks. Instance run bucket12/min and workspace6/min; workspace creation10/min. These are shared single-process limits, not distributed abuse protection. Max1,000 workspaces,100runs/workspace,10,000runs total,30day expiry lazily enforced by mutations. Headers32768 bytes and64 count; body32768bytes with2s deadline. Header/request ingress timeout5s. Errors are safe constant text:400input/SSRF,401auth,403origin,404isolation,405method,409streamreuse,408slowbody,413size,415type,429budget,503storage/shutdown,507capacity.
+
+Only HTTPS443; all DNS A/AAAA answers are validated, with conservative IPv4 special-use and IPv6 global-unicast exclusions and mapped-IPv4 checks. DNS has a2s cap; one validated IP is pinned into the actual request lookup. Original hostname controls SNI/certificate validation; certificate verification remains enabled. Agent reuse is disabled. Ordinary URL query parameters are sent and saved faithfully in private reports, subject to URL2048/query1024/pairs16/key64/value256 bounds. Credential-like keys such as token,key,auth,password,secret,signature are refused; do not put secrets in URL paths/ordinary values. No redirects, userinfo, fragments, arbitrary protocols/ports, custom headers or private-network bypass exists. Redirects become terminal errors with upstream status, without following Location or storing response bodies. Compressed upstream responses are refused; endpoints must honor identity encoding.
+
+## Secondary lab
+
+Legacy `/api/runs` still accepts its original exact5fields and keeps its original ephemeral fixture semantics: body8192bytes,20retained records,60s TTL,queued5s,12s total deadline. It is separate from authenticated durable product results. `node cli.mjs compare` retains local generator evidence; neither path contacts an external provider. The default UI profiles user endpoints.
+
+Primary references: https://nodejs.org/download/release/latest-v24.x/docs/api/sqlite.html ; https://nodejs.org/api/https.html ; https://nodejs.org/api/dns.html ; https://www.sqlite.org/pragma.html ; https://www.sqlite.org/wal.html ; https://docs.railway.com/guides/volumes ; https://docs.railway.com/config-as-code/reference ; https://vercel.com/docs/functions/functions-api-reference ; https://vercel.com/docs/project-configuration/vercel-json .
