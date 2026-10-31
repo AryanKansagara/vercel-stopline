@@ -2,7 +2,7 @@
 
 **An executable laboratory for cancellation through streamed HTTP workloads.** A local client disconnects, a proxy decides whether to propagate the abort, and a controlled provider records whether its work actually stops.
 
-This independent project is relevant to Vercel streaming applications, but it is not affiliated with Vercel. **The current prototype has no Vercel deployment, Vercel runtime adapter, AI model, or provider API integration.** It performs real loopback HTTP streaming and cancellation around an authored generator workload.
+This independent project is relevant to Vercel streaming applications, but it is not affiliated with Vercel. **The current prototype has no verified Vercel end-to-end cancellation result, AI model, or provider API integration. A cancellation-aware Vercel Node stream adapter is included; hosted validation remains separate from the local fixture.** It performs real loopback HTTP streaming and cancellation around an authored generator workload.
 
 ## Run
 
@@ -86,7 +86,7 @@ This project tests Node HTTP, stream backpressure, and abort propagation. It doe
 
 ## Next milestones
 
-1. Introduce a Vercel Node function adapter configured for documented request cancellation and compare its event timeline with the local reference contract.
+1. Validate the included cancellation-aware Vercel Node function against the hosted ingress and compare its event timeline with the local reference contract.
 2. Add a provider adapter that records confirmed cancellation acknowledgements and returned usage without assuming a closed client request ends vendor work.
 3. Test disconnects through a real browser and deployed ingress, including buffered responses, timeout, scale-down, and cleanup behavior.
 4. Validate the same-origin timeline interface with real browser ingress and broaden repeated paired workloads with resource and latency distributions.
@@ -103,6 +103,6 @@ The local server/fixture does not establish the hosted runtime or provider miles
 
 ## Web application backend
 
-`server.mjs` serves `web/` with a same-origin API. POST strict bounded fixture options to `/api/runs`, open its single-use `streamUrl`, abort the actual browser fetch to disconnect, and poll `statusUrl` until real resource cleanup completes. The path adds one public relay to the original three-component lab; the original lab still has three components and two network hops. Two active job slots, absolute deadlines, queued expiry, a creation-rate budget, result caps, and safe static-file boundaries bound each instance. A non-root Dockerfile and graceful shutdown support a future host; no live hosting or Vercel/provider integration is implied. Full response schema, limitations and run commands are in [deployment.md](deployment.md).
+`server.mjs` serves `web/` with a same-origin API. POST strict bounded fixture options to `/api/runs`, open its single-use `streamUrl`, abort the actual browser fetch to disconnect, and poll `statusUrl` until real resource cleanup completes. The path adds one public relay to the original three-component lab; the original lab still has three components and two network hops. Two active job slots, absolute deadlines, queued expiry, a creation-rate budget, result caps, and safe static-file boundaries bound each instance. A non-root Dockerfile and graceful shutdown support a future host; no live hosting or Vercel/provider integration is implied. The Vercel stream function passes the browser request signal to the fixed Railway backend; other API routes use external rewrites. Eight function tests exercise bounded routing, Web exports, real HTTP cancellation and both continuation controls through a test-only local transport substitution. They do not establish Vercel platform delivery of request cancellation. Full response schema, limitations and run commands are in [deployment.md](deployment.md).
 
 [benchmarks/server-http.json](benchmarks/server-http.json) records a separate four-case public-relay smoke run against an ephemeral local server: normal completion generated 12 units; cooperative propagation cancelled after one generated unit with zero later units; naive and noncooperative controls each generated all 12 with 11 after cancellation. All four post-close inventories were zero. These authored observations are timing-dependent local fixture results, not provider savings or a hosted-ingress guarantee.

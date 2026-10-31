@@ -6,6 +6,10 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/api/runs/:runId/stream",
+      "destination": "/api/stream?runId=:runId"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://stopline-production-05c5.up.railway.app/api/:path*"
     },
@@ -36,7 +40,7 @@
         },
         {
           "key": "Cache-Control",
-          "value": "no-store"
+          "value": "no-store, no-transform"
         },
         {
           "key": "Content-Security-Policy",
@@ -44,5 +48,11 @@
         }
       ]
     }
-  ]
+  ],
+  "functions": {
+    "api/stream.mjs": {
+      "supportsCancellation": true,
+      "maxDuration": 30
+    }
+  }
 }
