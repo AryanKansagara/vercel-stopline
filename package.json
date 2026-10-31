@@ -1,0 +1,12 @@
+{
+  "name": "vercel-stopline",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Observed HTTP streaming cancellation propagation laboratory",
+  "scripts": {
+    "test": "node --test",
+    "demo": "node cli.mjs compare"
+  },
+  "engines": { "node": ">=22" }
+}
