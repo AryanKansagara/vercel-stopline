@@ -38,7 +38,7 @@ for(const k of ['mode','policy','cancelAfterChunks','cancelAfterMs','model','max
 try{const u=new URL(c.endpoint);
 u.username='';
 u.password='';
-u.search='';
+for(const key of [...u.searchParams.keys()])if(/token|key|auth|password|secret|signature|credential/i.test(key))u.searchParams.delete(key);
 u.hash='';
 configuration.endpoint=u.toString();
 }catch{configuration.endpoint='Unavailable';
