@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
-import { createApp } from '../server.mjs';
+import { createApp, validatePublicOrigin } from '../server.mjs';
 const options = { policy: 'propagate', providerBehavior: 'cooperative', totalUnits: 12, intervalMs: 20, initialDelayMs: 20 };
 const delay = ms => new Promise(ok => setTimeout(ok, ms));
 async function fixture(t, extra = {}) {
@@ -152,4 +152,28 @@ test('readiness rejects an index symlink outside the static asset boundary', asy
   const { app, webRoot } = await fixture(t); const outside = join(webRoot, '..', 'stopline-outside-' + Date.now() + '.html');
   t.after(() => rm(outside, { force: true })); await writeFile(outside, '<h1>outside</h1>'); await rm(join(webRoot, 'index.html')); await symlink(outside, join(webRoot, 'index.html'));
   assert.equal((await fetch(app.url + '/readyz')).status, 503); assert.equal((await fetch(app.url)).status, 404); assert.equal((await fetch(app.url + '/healthz')).status, 200);
+});
+
+test('PUBLIC_ORIGIN fails invalid startup configuration before binding resources', async () => {
+  assert.equal(validatePublicOrigin(undefined), null);
+  assert.equal(validatePublicOrigin('https://stopline.example'), 'https://stopline.example');
+  for (const publicOrigin of ['', '*', 'https://*.example', 'http://stopline.example', 'https://stopline.example/', 'https://stopline.example/api', 'https://user:pass@stopline.example', 'https://stopline.example?x=1', 'https://stopline.example#fragment', 'https://stopline.example:443', ' https://stopline.example', 'https://stopline.example,https://other.example', null, 123]) {
+    await assert.rejects(createApp({ publicOrigin }), /PUBLIC_ORIGIN/);
+  }
+  const child = spawn(process.execPath, ['server.mjs'], { cwd: new URL('..', import.meta.url), env: { ...process.env, PORT: '0', PUBLIC_ORIGIN: '*' }, stdio: ['ignore', 'pipe', 'pipe'] });
+  let stdout = '', stderr = ''; child.stdout.on('data', s => stdout += s); child.stderr.on('data', s => stderr += s);
+  const [code] = await once(child, 'exit'); assert.notEqual(code, 0); assert.equal(stdout, ''); assert.match(stderr, /PUBLIC_ORIGIN/);
+});
+test('exact configured public Origin and direct same-origin work; spoofed forwarded origins do not', async t => {
+  const { app } = await fixture(t, { publicOrigin: 'https://stopline.example', limits: { queuedMs: 20 } });
+  const post = async (origin, extra = {}) => fetch(app.url + '/api/runs', { method: 'POST', headers: { 'content-type': 'application/json', origin, ...extra }, body: JSON.stringify(options) });
+  const allowed = await post('https://stopline.example'); assert.equal(allowed.status, 201); assert.equal(allowed.headers.get('access-control-allow-origin'), null);
+  await terminal(app, await allowed.json());
+  const direct = await post(app.url); assert.equal(direct.status, 201); await terminal(app, await direct.json());
+  const forged = await post('https://forged.example', { 'x-forwarded-host': 'forged.example', 'x-forwarded-proto': 'https', forwarded: 'host=forged.example;proto=https' });
+  assert.equal(forged.status, 403);
+  for (const origin of ['https://stopline.example.evil.test', 'https://evil.stopline.example', 'http://stopline.example', 'https://stopline.example:444', 'null']) {
+    const response = await post(origin, { 'x-forwarded-host': 'stopline.example', 'x-forwarded-proto': 'https', forwarded: 'host=stopline.example;proto=https' });
+    assert.equal(response.status, 403, origin);
+  }
 });
