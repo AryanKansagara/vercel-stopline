@@ -1,0 +1,5440 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-31T19:21:17.101Z",
+  "environment": {
+    "node": "v24.22.1",
+    "platform": "linux"
+  },
+  "notice": "Actual local HTTP streaming and disconnection; authored generator work. No Vercel runtime, AI inference, or provider billing measurements.",
+  "repeats": 3,
+  "summary": [
+    {
+      "scenario": "before-first-unit",
+      "policies": {
+        "naive": {
+          "runs": 3,
+          "providerUnits": 36,
+          "unitsAfterCancel": 36,
+          "observedProviderCancellations": 0,
+          "resourcesSettled": true
+        },
+        "propagate": {
+          "runs": 3,
+          "providerUnits": 0,
+          "unitsAfterCancel": 0,
+          "observedProviderCancellations": 3,
+          "resourcesSettled": true
+        }
+      }
+    },
+    {
+      "scenario": "midstream",
+      "policies": {
+        "naive": {
+          "runs": 3,
+          "providerUnits": 36,
+          "unitsAfterCancel": 27,
+          "observedProviderCancellations": 0,
+          "resourcesSettled": true
+        },
+        "propagate": {
+          "runs": 3,
+          "providerUnits": 9,
+          "unitsAfterCancel": 0,
+          "observedProviderCancellations": 3,
+          "resourcesSettled": true
+        }
+      }
+    },
+    {
+      "scenario": "normal-completion",
+      "policies": {
+        "naive": {
+          "runs": 3,
+          "providerUnits": 36,
+          "unitsAfterCancel": 0,
+          "observedProviderCancellations": 0,
+          "resourcesSettled": true
+        },
+        "propagate": {
+          "runs": 3,
+          "providerUnits": 36,
+          "unitsAfterCancel": 0,
+          "observedProviderCancellations": 0,
+          "resourcesSettled": true
+        }
+      }
+    },
+    {
+      "scenario": "provider-error",
+      "policies": {
+        "naive": {
+          "runs": 3,
+          "providerUnits": 12,
+          "unitsAfterCancel": 0,
+          "observedProviderCancellations": 0,
+          "resourcesSettled": true
+        },
+        "propagate": {
+          "runs": 3,
+          "providerUnits": 12,
+          "unitsAfterCancel": 0,
+          "observedProviderCancellations": 0,
+          "resourcesSettled": true
+        }
+      }
+    },
+    {
+      "scenario": "provider-ignores-cancel",
+      "policies": {
+        "naive": {
+          "runs": 3,
+          "providerUnits": 36,
+          "unitsAfterCancel": 27,
+          "observedProviderCancellations": 0,
+          "resourcesSettled": true
+        },
+        "propagate": {
+          "runs": 3,
+          "providerUnits": 36,
+          "unitsAfterCancel": 27,
+          "observedProviderCancellations": 0,
+          "resourcesSettled": true
+        }
+      }
+    }
+  ],
+  "runs": [
+    {
+      "scenario": "before-first-unit",
+      "repeat": 0,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "naive",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 40,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 0,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 0,
+        "receivedBytes": 0,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 17.295,
+        "clientCancelSequence": 2,
+        "providerUnitsAfterCancel": 12,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 14.352,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 16.432,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 17.295,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 3,
+          "atMs": 20.834,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 4,
+          "atMs": 57.377,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 5,
+          "atMs": 65.614,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 6,
+          "atMs": 73.407,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 7,
+          "atMs": 82.181,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 8,
+          "atMs": 90.814,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 9,
+          "atMs": 98.872,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 10,
+          "atMs": 106.235,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 11,
+          "atMs": 114.924,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 12,
+          "atMs": 122.856,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 13,
+          "atMs": 130.517,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 14,
+          "atMs": 138.32,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 15,
+          "atMs": 147.047,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 16,
+          "atMs": 147.076,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 17,
+          "atMs": 147.291,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 18,
+          "atMs": 148.195,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 140.639,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 17.295,
+        "clientCancelSequence": 2,
+        "providerUnitsAfterCancel": 12,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "before-first-unit",
+      "repeat": 0,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "propagate",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 40,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 0,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 0,
+        "receivedBytes": 0,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 1,
+        "providerErrors": 0,
+        "providerUnits": 0,
+        "providerWrites": 0,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 2.033,
+        "clientCancelSequence": 2,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": 1.21,
+        "providerCancellationObserved": true
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 1.093,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.91,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 2.033,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 3,
+          "atMs": 2.396,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 4,
+          "atMs": 2.401,
+          "kind": "proxy-abort-upstream",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 5,
+          "atMs": 2.951,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 6,
+          "atMs": 3.163,
+          "kind": "provider-peer-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 7,
+          "atMs": 3.243,
+          "kind": "provider-cancelled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 8,
+          "atMs": 3.246,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 4.234,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 1,
+        "providerErrors": 0,
+        "providerUnits": 0,
+        "providerWrites": 0,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 2.033,
+        "clientCancelSequence": 2,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": 1.21,
+        "providerCancellationObserved": true
+      }
+    },
+    {
+      "scenario": "before-first-unit",
+      "repeat": 1,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "propagate",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 40,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 0,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 0,
+        "receivedBytes": 0,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 1,
+        "providerErrors": 0,
+        "providerUnits": 0,
+        "providerWrites": 0,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 1.581,
+        "clientCancelSequence": 2,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": 0.772,
+        "providerCancellationObserved": true
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.902,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.476,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 1.581,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 3,
+          "atMs": 1.971,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 4,
+          "atMs": 1.974,
+          "kind": "proxy-abort-upstream",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 5,
+          "atMs": 2.085,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 6,
+          "atMs": 2.306,
+          "kind": "provider-peer-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 7,
+          "atMs": 2.353,
+          "kind": "provider-cancelled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 8,
+          "atMs": 2.354,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 3.194,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 1,
+        "providerErrors": 0,
+        "providerUnits": 0,
+        "providerWrites": 0,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 1.581,
+        "clientCancelSequence": 2,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": 0.772,
+        "providerCancellationObserved": true
+      }
+    },
+    {
+      "scenario": "before-first-unit",
+      "repeat": 1,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "naive",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 40,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 0,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 0,
+        "receivedBytes": 0,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 2.087,
+        "clientCancelSequence": 2,
+        "providerUnitsAfterCancel": 12,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 1.268,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.925,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 2.087,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 3,
+          "atMs": 2.486,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 4,
+          "atMs": 42.793,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 5,
+          "atMs": 51.653,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 6,
+          "atMs": 59.353,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 7,
+          "atMs": 67.012,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 8,
+          "atMs": 75.691,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 9,
+          "atMs": 84.333,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 10,
+          "atMs": 92.117,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 11,
+          "atMs": 99.866,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 12,
+          "atMs": 108.693,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 13,
+          "atMs": 117.462,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 14,
+          "atMs": 125.09,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 15,
+          "atMs": 133.797,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 16,
+          "atMs": 133.835,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 17,
+          "atMs": 133.928,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 18,
+          "atMs": 134.319,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 136.421,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 2.087,
+        "clientCancelSequence": 2,
+        "providerUnitsAfterCancel": 12,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "before-first-unit",
+      "repeat": 2,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "naive",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 40,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 0,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 0,
+        "receivedBytes": 0,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 2.155,
+        "clientCancelSequence": 2,
+        "providerUnitsAfterCancel": 12,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 1.414,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 2.021,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 2.155,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 3,
+          "atMs": 2.568,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 4,
+          "atMs": 42.017,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 5,
+          "atMs": 49.965,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 6,
+          "atMs": 58.878,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 7,
+          "atMs": 67.531,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 8,
+          "atMs": 75.077,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 9,
+          "atMs": 82.806,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 10,
+          "atMs": 91.486,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 11,
+          "atMs": 98.925,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 12,
+          "atMs": 107.643,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 13,
+          "atMs": 115.417,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 14,
+          "atMs": 123.033,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 15,
+          "atMs": 131.844,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 16,
+          "atMs": 131.882,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 17,
+          "atMs": 132.039,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 18,
+          "atMs": 132.611,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 134.53,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 2.155,
+        "clientCancelSequence": 2,
+        "providerUnitsAfterCancel": 12,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "before-first-unit",
+      "repeat": 2,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "propagate",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 40,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 0,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 0,
+        "receivedBytes": 0,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 1,
+        "providerErrors": 0,
+        "providerUnits": 0,
+        "providerWrites": 0,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 1.593,
+        "clientCancelSequence": 2,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": 0.67,
+        "providerCancellationObserved": true
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 1.102,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.534,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 1.593,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 3,
+          "atMs": 1.892,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 4,
+          "atMs": 1.895,
+          "kind": "proxy-abort-upstream",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 5,
+          "atMs": 2.078,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 6,
+          "atMs": 2.179,
+          "kind": "provider-peer-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 7,
+          "atMs": 2.263,
+          "kind": "provider-cancelled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 8,
+          "atMs": 2.264,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 3.181,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 1,
+        "providerErrors": 0,
+        "providerUnits": 0,
+        "providerWrites": 0,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 1.593,
+        "clientCancelSequence": 2,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": 0.67,
+        "providerCancellationObserved": true
+      }
+    },
+    {
+      "scenario": "midstream",
+      "repeat": 0,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "naive",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 3,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 3,
+        "receivedBytes": 105,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 27.567,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.971,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.384,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 10.171,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 18.843,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 27.257,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 27.567,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 6,
+          "atMs": 28.463,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 7,
+          "atMs": 35.949,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 8,
+          "atMs": 43.523,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 9,
+          "atMs": 52.068,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 10,
+          "atMs": 59.604,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 11,
+          "atMs": 68.154,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 12,
+          "atMs": 75.782,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 13,
+          "atMs": 83.324,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 14,
+          "atMs": 91.881,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 15,
+          "atMs": 99.411,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 16,
+          "atMs": 99.435,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 17,
+          "atMs": 99.501,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 18,
+          "atMs": 99.742,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 100.633,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 27.567,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "midstream",
+      "repeat": 0,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "propagate",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 3,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 3,
+        "receivedBytes": 105,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 1,
+        "providerErrors": 0,
+        "providerUnits": 3,
+        "providerWrites": 3,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 25.378,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": 0.851,
+        "providerCancellationObserved": true
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.675,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.03,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 8.382,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 16.805,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 25.188,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 25.378,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 6,
+          "atMs": 25.883,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 7,
+          "atMs": 25.886,
+          "kind": "proxy-abort-upstream",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 8,
+          "atMs": 26.06,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 9,
+          "atMs": 26.189,
+          "kind": "provider-peer-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 10,
+          "atMs": 26.229,
+          "kind": "provider-cancelled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 11,
+          "atMs": 26.23,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 27.118,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 1,
+        "providerErrors": 0,
+        "providerUnits": 3,
+        "providerWrites": 3,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 25.378,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": 0.851,
+        "providerCancellationObserved": true
+      }
+    },
+    {
+      "scenario": "midstream",
+      "repeat": 1,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "propagate",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 3,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 3,
+        "receivedBytes": 105,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 1,
+        "providerErrors": 0,
+        "providerUnits": 3,
+        "providerWrites": 3,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 25.439,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": 0.788,
+        "providerCancellationObserved": true
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.649,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.046,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 9.478,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 16.736,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 25.272,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 25.439,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 6,
+          "atMs": 25.83,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 7,
+          "atMs": 25.834,
+          "kind": "proxy-abort-upstream",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 8,
+          "atMs": 26.015,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 9,
+          "atMs": 26.118,
+          "kind": "provider-peer-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 10,
+          "atMs": 26.227,
+          "kind": "provider-cancelled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 11,
+          "atMs": 26.23,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 27.194,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 1,
+        "providerErrors": 0,
+        "providerUnits": 3,
+        "providerWrites": 3,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 25.439,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": 0.788,
+        "providerCancellationObserved": true
+      }
+    },
+    {
+      "scenario": "midstream",
+      "repeat": 1,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "naive",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 3,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 3,
+        "receivedBytes": 105,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 25.963,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.473,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 0.877,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 9.161,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 17.448,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 25.775,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 25.963,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 6,
+          "atMs": 26.305,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 7,
+          "atMs": 33.759,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 8,
+          "atMs": 41.345,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 9,
+          "atMs": 50.112,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 10,
+          "atMs": 57.785,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 11,
+          "atMs": 65.575,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 12,
+          "atMs": 74.276,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 13,
+          "atMs": 83.171,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 14,
+          "atMs": 92.292,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 15,
+          "atMs": 101.023,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 16,
+          "atMs": 101.049,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 17,
+          "atMs": 101.133,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 18,
+          "atMs": 101.478,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 103.61,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 25.963,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "midstream",
+      "repeat": 2,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "naive",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 3,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 3,
+        "receivedBytes": 105,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 25.927,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 1.285,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.635,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 9.931,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 18.269,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 25.647,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 25.927,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 6,
+          "atMs": 26.439,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 7,
+          "atMs": 33.836,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 8,
+          "atMs": 42.414,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 9,
+          "atMs": 50.948,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 10,
+          "atMs": 58.456,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 11,
+          "atMs": 67.108,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 12,
+          "atMs": 74.631,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 13,
+          "atMs": 83.236,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 14,
+          "atMs": 90.868,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 15,
+          "atMs": 98.442,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 16,
+          "atMs": 98.458,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 17,
+          "atMs": 98.514,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 18,
+          "atMs": 98.812,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 100.869,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 25.927,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "midstream",
+      "repeat": 2,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "propagate",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 3,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 3,
+        "receivedBytes": 105,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 1,
+        "providerErrors": 0,
+        "providerUnits": 3,
+        "providerWrites": 3,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 26.013,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": 0.779,
+        "providerCancellationObserved": true
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 1.26,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.602,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 9.895,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 17.395,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 25.76,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 26.013,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 6,
+          "atMs": 26.448,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 7,
+          "atMs": 26.455,
+          "kind": "proxy-abort-upstream",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 8,
+          "atMs": 26.6,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 9,
+          "atMs": 26.695,
+          "kind": "provider-peer-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 10,
+          "atMs": 26.792,
+          "kind": "provider-cancelled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 11,
+          "atMs": 26.794,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 28.794,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 1,
+        "providerErrors": 0,
+        "providerUnits": 3,
+        "providerWrites": 3,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 26.013,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": 0.779,
+        "providerCancellationObserved": true
+      }
+    },
+    {
+      "scenario": "normal-completion",
+      "repeat": 0,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "naive",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": null,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "complete",
+        "receivedUnits": 12,
+        "receivedBytes": 423,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 1.263,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.761,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 10.05,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 17.414,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 25.825,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 34.304,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 6,
+          "atMs": 42.747,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 7,
+          "atMs": 51.3,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 8,
+          "atMs": 59.985,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 9,
+          "atMs": 67.508,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 10,
+          "atMs": 76.274,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 11,
+          "atMs": 84.81,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 12,
+          "atMs": 93.189,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 13,
+          "atMs": 101.691,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 14,
+          "atMs": 101.725,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 15,
+          "atMs": 101.822,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 16,
+          "atMs": 102.106,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 102.38,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "normal-completion",
+      "repeat": 0,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "propagate",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": null,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "complete",
+        "receivedUnits": 12,
+        "receivedBytes": 423,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 1.186,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.804,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 10.219,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 18.68,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 27.067,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 35.435,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 6,
+          "atMs": 42.89,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 7,
+          "atMs": 51.23,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 8,
+          "atMs": 59.562,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 9,
+          "atMs": 67.958,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 10,
+          "atMs": 76.334,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 11,
+          "atMs": 84.658,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 12,
+          "atMs": 92.981,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 13,
+          "atMs": 101.316,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 14,
+          "atMs": 101.337,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 15,
+          "atMs": 101.418,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 16,
+          "atMs": 101.721,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 101.705,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "normal-completion",
+      "repeat": 1,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "propagate",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": null,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "complete",
+        "receivedUnits": 12,
+        "receivedBytes": 423,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.648,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.162,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 9.479,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 16.82,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 25.175,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 33.474,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 6,
+          "atMs": 40.781,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 7,
+          "atMs": 49.072,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 8,
+          "atMs": 57.377,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 9,
+          "atMs": 65.681,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 10,
+          "atMs": 73.994,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 11,
+          "atMs": 82.365,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 12,
+          "atMs": 89.759,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 13,
+          "atMs": 98.134,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 14,
+          "atMs": 98.17,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 15,
+          "atMs": 98.251,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 16,
+          "atMs": 99.047,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 99.665,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "normal-completion",
+      "repeat": 1,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "naive",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": null,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "complete",
+        "receivedUnits": 12,
+        "receivedBytes": 423,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.574,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 0.843,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 9.289,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 17.804,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 26.535,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 34.068,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 6,
+          "atMs": 42.544,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 7,
+          "atMs": 49.994,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 8,
+          "atMs": 58.313,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 9,
+          "atMs": 66.704,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 10,
+          "atMs": 75.008,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 11,
+          "atMs": 83.724,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 12,
+          "atMs": 92.291,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 13,
+          "atMs": 99.885,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 14,
+          "atMs": 99.918,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 15,
+          "atMs": 99.992,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 16,
+          "atMs": 100.37,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 100.458,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "normal-completion",
+      "repeat": 2,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "naive",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": null,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "complete",
+        "receivedUnits": 12,
+        "receivedBytes": 423,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 1.166,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.444,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 9.885,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 17.455,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 25.878,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 33.254,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 6,
+          "atMs": 41.985,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 7,
+          "atMs": 50.387,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 8,
+          "atMs": 58.881,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 9,
+          "atMs": 67.1,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 10,
+          "atMs": 75.383,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 11,
+          "atMs": 83.896,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 12,
+          "atMs": 91.201,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 13,
+          "atMs": 99.748,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 14,
+          "atMs": 99.774,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 15,
+          "atMs": 99.837,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 16,
+          "atMs": 100.07,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 99.987,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "normal-completion",
+      "repeat": 2,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "propagate",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": null,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "complete",
+        "receivedUnits": 12,
+        "receivedBytes": 423,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.56,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.142,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 9.078,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 17.04,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 25.359,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 33.623,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 6,
+          "atMs": 41.989,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 7,
+          "atMs": 50.457,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 8,
+          "atMs": 58.068,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 9,
+          "atMs": 66.421,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 10,
+          "atMs": 74.705,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 11,
+          "atMs": 83.078,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 12,
+          "atMs": 91.518,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 13,
+          "atMs": 98.858,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 14,
+          "atMs": 98.894,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 15,
+          "atMs": 99.011,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 16,
+          "atMs": 99.365,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 99.417,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "provider-error",
+      "repeat": 0,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "naive",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": 5,
+        "cancelAfterUnits": null,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "error",
+        "receivedUnits": 4,
+        "receivedBytes": 140,
+        "error": "Stream aborted",
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 0,
+        "providerErrors": 1,
+        "providerUnits": 4,
+        "providerWrites": 4,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 0,
+        "proxyErrors": 1,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 1,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 2.835,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 3.291,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 11.598,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 19.959,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 28.206,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 36.52,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 6,
+          "atMs": 44.97,
+          "kind": "provider-error",
+          "provenance": "observed",
+          "message": "Injected provider error"
+        },
+        {
+          "sequence": 7,
+          "atMs": 45.289,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 8,
+          "atMs": 45.711,
+          "kind": "proxy-upstream-error",
+          "provenance": "observed",
+          "message": "Provider stream aborted"
+        },
+        {
+          "sequence": 9,
+          "atMs": 45.806,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 10,
+          "atMs": 45.892,
+          "kind": "provider-peer-close",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 46.049,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 0,
+        "providerErrors": 1,
+        "providerUnits": 4,
+        "providerWrites": 4,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 0,
+        "proxyErrors": 1,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "provider-error",
+      "repeat": 0,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "propagate",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": 5,
+        "cancelAfterUnits": null,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "error",
+        "receivedUnits": 4,
+        "receivedBytes": 140,
+        "error": "Stream aborted",
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 0,
+        "providerErrors": 1,
+        "providerUnits": 4,
+        "providerWrites": 4,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 0,
+        "proxyErrors": 1,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 1,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 1.222,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.759,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 10.195,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 18.504,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 25.823,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 34.255,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 6,
+          "atMs": 42.757,
+          "kind": "provider-error",
+          "provenance": "observed",
+          "message": "Injected provider error"
+        },
+        {
+          "sequence": 7,
+          "atMs": 42.872,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 8,
+          "atMs": 43.104,
+          "kind": "proxy-upstream-error",
+          "provenance": "observed",
+          "message": "Provider stream aborted"
+        },
+        {
+          "sequence": 9,
+          "atMs": 43.145,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 10,
+          "atMs": 43.257,
+          "kind": "provider-peer-close",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 43.246,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 0,
+        "providerErrors": 1,
+        "providerUnits": 4,
+        "providerWrites": 4,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 0,
+        "proxyErrors": 1,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "provider-error",
+      "repeat": 1,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "propagate",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": 5,
+        "cancelAfterUnits": null,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "error",
+        "receivedUnits": 4,
+        "receivedBytes": 140,
+        "error": "Stream aborted",
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 0,
+        "providerErrors": 1,
+        "providerUnits": 4,
+        "providerWrites": 4,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 0,
+        "proxyErrors": 1,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 1,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.676,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.287,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 9.569,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 17.88,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 26.166,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 34.416,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 6,
+          "atMs": 42.764,
+          "kind": "provider-error",
+          "provenance": "observed",
+          "message": "Injected provider error"
+        },
+        {
+          "sequence": 7,
+          "atMs": 42.865,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 8,
+          "atMs": 43.056,
+          "kind": "proxy-upstream-error",
+          "provenance": "observed",
+          "message": "Provider stream aborted"
+        },
+        {
+          "sequence": 9,
+          "atMs": 43.094,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 10,
+          "atMs": 43.169,
+          "kind": "provider-peer-close",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 43.094,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 0,
+        "providerErrors": 1,
+        "providerUnits": 4,
+        "providerWrites": 4,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 0,
+        "proxyErrors": 1,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "provider-error",
+      "repeat": 1,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "naive",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": 5,
+        "cancelAfterUnits": null,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "error",
+        "receivedUnits": 4,
+        "receivedBytes": 140,
+        "error": "Stream aborted",
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 0,
+        "providerErrors": 1,
+        "providerUnits": 4,
+        "providerWrites": 4,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 0,
+        "proxyErrors": 1,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 1,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.846,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.319,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 9.626,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 16.89,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 25.17,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 33.922,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 6,
+          "atMs": 42.431,
+          "kind": "provider-error",
+          "provenance": "observed",
+          "message": "Injected provider error"
+        },
+        {
+          "sequence": 7,
+          "atMs": 42.538,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 8,
+          "atMs": 42.821,
+          "kind": "proxy-upstream-error",
+          "provenance": "observed",
+          "message": "Provider stream aborted"
+        },
+        {
+          "sequence": 9,
+          "atMs": 42.862,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 10,
+          "atMs": 42.938,
+          "kind": "provider-peer-close",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 42.704,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 0,
+        "providerErrors": 1,
+        "providerUnits": 4,
+        "providerWrites": 4,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 0,
+        "proxyErrors": 1,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "provider-error",
+      "repeat": 2,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "naive",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": 5,
+        "cancelAfterUnits": null,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "error",
+        "receivedUnits": 4,
+        "receivedBytes": 140,
+        "error": "Stream aborted",
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 0,
+        "providerErrors": 1,
+        "providerUnits": 4,
+        "providerWrites": 4,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 0,
+        "proxyErrors": 1,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 1,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 1.094,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.87,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 10.278,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 17.713,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 26.177,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 34.724,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 6,
+          "atMs": 43.316,
+          "kind": "provider-error",
+          "provenance": "observed",
+          "message": "Injected provider error"
+        },
+        {
+          "sequence": 7,
+          "atMs": 43.445,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 8,
+          "atMs": 43.697,
+          "kind": "proxy-upstream-error",
+          "provenance": "observed",
+          "message": "Provider stream aborted"
+        },
+        {
+          "sequence": 9,
+          "atMs": 43.748,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 10,
+          "atMs": 43.826,
+          "kind": "provider-peer-close",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 43.684,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 0,
+        "providerErrors": 1,
+        "providerUnits": 4,
+        "providerWrites": 4,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 0,
+        "proxyErrors": 1,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "provider-error",
+      "repeat": 2,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "propagate",
+        "providerBehavior": "cooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": 5,
+        "cancelAfterUnits": null,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "error",
+        "receivedUnits": 4,
+        "receivedBytes": 140,
+        "error": "Stream aborted",
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 0,
+        "providerErrors": 1,
+        "providerUnits": 4,
+        "providerWrites": 4,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 0,
+        "proxyErrors": 1,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 1,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.779,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 14.615,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 22.999,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 31.499,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 39.994,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 48.517,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 6,
+          "atMs": 57.088,
+          "kind": "provider-error",
+          "provenance": "observed",
+          "message": "Injected provider error"
+        },
+        {
+          "sequence": 7,
+          "atMs": 57.224,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 8,
+          "atMs": 57.453,
+          "kind": "proxy-upstream-error",
+          "provenance": "observed",
+          "message": "Provider stream aborted"
+        },
+        {
+          "sequence": 9,
+          "atMs": 57.55,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 10,
+          "atMs": 57.632,
+          "kind": "provider-peer-close",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 57.562,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 0,
+        "providerCancelled": 0,
+        "providerErrors": 1,
+        "providerUnits": 4,
+        "providerWrites": 4,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 0,
+        "proxyErrors": 1,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": null,
+        "clientCancelSequence": null,
+        "providerUnitsAfterCancel": 0,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "provider-ignores-cancel",
+      "repeat": 0,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "naive",
+        "providerBehavior": "noncooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 3,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 3,
+        "receivedBytes": 105,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 26.049,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.757,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.114,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 9.023,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 17.373,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 25.763,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 26.049,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 6,
+          "atMs": 26.508,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 7,
+          "atMs": 34.039,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 8,
+          "atMs": 42.732,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 9,
+          "atMs": 51.56,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 10,
+          "atMs": 59.264,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 11,
+          "atMs": 66.904,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 12,
+          "atMs": 74.675,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 13,
+          "atMs": 83.353,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 14,
+          "atMs": 91.137,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 15,
+          "atMs": 99.024,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 16,
+          "atMs": 99.05,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 17,
+          "atMs": 99.142,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 18,
+          "atMs": 99.401,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 101.355,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 26.049,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "provider-ignores-cancel",
+      "repeat": 0,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "propagate",
+        "providerBehavior": "noncooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 3,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 3,
+        "receivedBytes": 105,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 3,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 26.46,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.813,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.628,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 10.017,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 17.616,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 26.186,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 26.46,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 6,
+          "atMs": 26.995,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 7,
+          "atMs": 26.998,
+          "kind": "proxy-abort-upstream",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 8,
+          "atMs": 27.143,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 9,
+          "atMs": 27.293,
+          "kind": "provider-peer-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 10,
+          "atMs": 33.74,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 11,
+          "atMs": 42.218,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 12,
+          "atMs": 49.687,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 13,
+          "atMs": 58.277,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 14,
+          "atMs": 65.621,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 15,
+          "atMs": 74.093,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 16,
+          "atMs": 81.552,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 17,
+          "atMs": 90.22,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 18,
+          "atMs": 97.726,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 19,
+          "atMs": 97.738,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 20,
+          "atMs": 97.74,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 97.615,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 3,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 26.46,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "provider-ignores-cancel",
+      "repeat": 1,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "propagate",
+        "providerBehavior": "noncooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 3,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 3,
+        "receivedBytes": 105,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 3,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 26.762,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.644,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.181,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 9.52,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 17.997,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 26.385,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 26.762,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 6,
+          "atMs": 27.375,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 7,
+          "atMs": 27.378,
+          "kind": "proxy-abort-upstream",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 8,
+          "atMs": 27.683,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 9,
+          "atMs": 27.787,
+          "kind": "provider-peer-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 10,
+          "atMs": 35.351,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 11,
+          "atMs": 42.786,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 12,
+          "atMs": 51.416,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 13,
+          "atMs": 58.825,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 14,
+          "atMs": 67.228,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 15,
+          "atMs": 74.65,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 16,
+          "atMs": 83.17,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 17,
+          "atMs": 90.594,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 18,
+          "atMs": 99.217,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 19,
+          "atMs": 99.229,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 20,
+          "atMs": 99.231,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 99.084,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 3,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 26.762,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "provider-ignores-cancel",
+      "repeat": 1,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "naive",
+        "providerBehavior": "noncooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 3,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 3,
+        "receivedBytes": 105,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 26.073,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.944,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.473,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 9.895,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 17.37,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 25.878,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 26.073,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 6,
+          "atMs": 26.545,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 7,
+          "atMs": 33.963,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 8,
+          "atMs": 41.539,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 9,
+          "atMs": 49.124,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 10,
+          "atMs": 57.776,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 11,
+          "atMs": 65.494,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 12,
+          "atMs": 73.188,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 13,
+          "atMs": 81.882,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 14,
+          "atMs": 89.406,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 15,
+          "atMs": 98.054,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 16,
+          "atMs": 98.083,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 17,
+          "atMs": 98.145,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 18,
+          "atMs": 98.339,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 98.205,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 26.073,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "provider-ignores-cancel",
+      "repeat": 2,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "naive",
+        "providerBehavior": "noncooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 3,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 3,
+        "receivedBytes": 105,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 25.256,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.848,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.206,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 9.446,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 16.755,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 25.025,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 25.256,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 6,
+          "atMs": 25.723,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 7,
+          "atMs": 33.102,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 8,
+          "atMs": 41.622,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 9,
+          "atMs": 50.187,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 10,
+          "atMs": 57.724,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 11,
+          "atMs": 66.374,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 12,
+          "atMs": 73.948,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 13,
+          "atMs": 82.569,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 14,
+          "atMs": 91.193,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 15,
+          "atMs": 98.797,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 16,
+          "atMs": 98.821,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 17,
+          "atMs": 98.885,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 18,
+          "atMs": 99.125,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 100.136,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 12,
+        "providerPeerCloses": 0,
+        "propagatedAborts": 0,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 25.256,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    },
+    {
+      "scenario": "provider-ignores-cancel",
+      "repeat": 2,
+      "schemaVersion": 1,
+      "validation": "real-loopback-http-with-controlled-generator",
+      "configuration": {
+        "policy": "propagate",
+        "providerBehavior": "noncooperative",
+        "totalUnits": 12,
+        "intervalMs": 8,
+        "initialDelayMs": 8,
+        "payloadBytes": 32,
+        "failAt": null,
+        "cancelAfterUnits": 3,
+        "pauseMs": 0,
+        "provenance": "fixture"
+      },
+      "client": {
+        "status": "cancelled",
+        "receivedUnits": 3,
+        "receivedBytes": 105,
+        "error": null,
+        "activePauseTimers": 0
+      },
+      "metrics": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 3,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 25.355,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 2,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      },
+      "events": [
+        {
+          "sequence": 0,
+          "atMs": 0.628,
+          "kind": "proxy-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 1,
+          "atMs": 1.211,
+          "kind": "provider-start",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 2,
+          "atMs": 9.522,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 1
+        },
+        {
+          "sequence": 3,
+          "atMs": 17.912,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 2
+        },
+        {
+          "sequence": 4,
+          "atMs": 25.172,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 3
+        },
+        {
+          "sequence": 5,
+          "atMs": 25.355,
+          "kind": "client-cancel",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 6,
+          "atMs": 25.764,
+          "kind": "proxy-client-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 7,
+          "atMs": 25.768,
+          "kind": "proxy-abort-upstream",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 8,
+          "atMs": 25.933,
+          "kind": "proxy-settled",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 9,
+          "atMs": 26.158,
+          "kind": "provider-peer-close",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 10,
+          "atMs": 33.606,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 4
+        },
+        {
+          "sequence": 11,
+          "atMs": 42.037,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 5
+        },
+        {
+          "sequence": 12,
+          "atMs": 50.084,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 6
+        },
+        {
+          "sequence": 13,
+          "atMs": 58.744,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 7
+        },
+        {
+          "sequence": 14,
+          "atMs": 66.344,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 8
+        },
+        {
+          "sequence": 15,
+          "atMs": 74.94,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 9
+        },
+        {
+          "sequence": 16,
+          "atMs": 82.408,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 10
+        },
+        {
+          "sequence": 17,
+          "atMs": 90.914,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 11
+        },
+        {
+          "sequence": 18,
+          "atMs": 98.338,
+          "kind": "provider-unit",
+          "provenance": "observed",
+          "unit": 12
+        },
+        {
+          "sequence": 19,
+          "atMs": 98.347,
+          "kind": "provider-complete",
+          "provenance": "observed"
+        },
+        {
+          "sequence": 20,
+          "atMs": 98.349,
+          "kind": "provider-settled",
+          "provenance": "observed"
+        }
+      ],
+      "elapsedMs": 98.336,
+      "inferenceMeasured": false,
+      "providerBilling": "not measured; fixture has no vendor billing",
+      "cleanup": {
+        "providerStarted": 1,
+        "providerCompleted": 1,
+        "providerCancelled": 0,
+        "providerErrors": 0,
+        "providerUnits": 12,
+        "providerWrites": 3,
+        "providerPeerCloses": 1,
+        "propagatedAborts": 1,
+        "proxyErrors": 0,
+        "activeProxyRequests": 0,
+        "providerBackpressure": 0,
+        "proxyBackpressure": 0,
+        "clientCancelAtMs": 25.355,
+        "clientCancelSequence": 5,
+        "providerUnitsAfterCancel": 9,
+        "activeProviderJobs": 0,
+        "activeTimers": 0,
+        "openSockets": 0,
+        "listeningServers": 0,
+        "cancellationLatencyMs": null,
+        "providerCancellationObserved": false
+      }
+    }
+  ]
+}
