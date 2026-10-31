@@ -11,6 +11,8 @@ jobs:
         with:
           node-version: 24
       - run: npm test
+      - name: Build static frontend artifact
+        run: node scripts/build-frontend.mjs
       - run: node cli.mjs compare --repeats 1
   container:
     runs-on: ubuntu-latest
