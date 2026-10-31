@@ -56,12 +56,13 @@ export class Profiler {
     this.store = new RunStore(dataDir); this.jobs = new Map(); this.admitting = 0; this.admissionTasks = new Set(); this.otherActive = otherActive; this.allowOrigin = allowOrigin;
     this.resolve = dependencies.resolvePublicTarget ?? resolvePublicTarget; this.open = dependencies.openPinnedRequest ?? openPinnedRequest;
     this.deadlineMs = Math.min(dependencies.deadlineMs ?? 15000,15000); this.queuedMs = Math.min(dependencies.queuedMs ?? 10000,10000);
-    this.globalBudget = new Bucket(12); this.workspaceBudget = new Map(); this.workspaceCreation = new Bucket(10); this.closing = false;
+    this.globalBudget = new Bucket(12); this.workspaceBudget = new Map(); this.workspaceCreation = new Bucket(10); this.closing = false; this.storageFault = false;
   }
+  ready() { return !this.closing && !this.storageFault && Boolean(this.store.db); }
   activeCount() { return this.jobs.size + this.admitting; }
   auth(req) { const match = /^Bearer ([0-9a-f]{64})$/.exec(req.headers.authorization ?? ''); const owner = match && this.store.authenticate(match[1]); if (!owner) throw new ApiError(401, 'A valid private workspace token is required'); return owner; }
   record(job, kind, fields = {}) { job.report.events.push({ sequence: job.sequence++, atMs: +(performance.now() - job.started).toFixed(3), kind, ...fields }); }
-  persist(job) { try { this.store.save(job.owner, job.report); job.lastSaved = performance.now(); return true; } catch { job.storageError = true; if (!job.pending) queueMicrotask(() => { void this.stop(job,'error','storage_capacity','Private storage capacity exhausted'); }); return false; } }
+  persist(job) { try { this.store.save(job.owner, job.report); job.lastSaved = performance.now(); return true; } catch { job.storageError = true; this.storageFault = true; if (!job.pending) queueMicrotask(() => { void this.stop(job,'error','storage_capacity','Private storage capacity exhausted'); }); return false; } }
   snapshot(job) { const result = structuredClone(job.report); if (job.startedAt) result.metrics.durationMs = +(performance.now() - job.started).toFixed(3); return result; }
   finish(job, status, reason, error = null) {
     if (job.pending) return;
@@ -161,6 +162,7 @@ export class Profiler {
     if (!(path === '/api/workspaces' || path === '/api/workspaces/current' || path === '/api/profile-runs' || path.startsWith('/api/profile-runs/'))) return false;
     try {
       if (this.closing) throw new ApiError(503,'Server is shutting down');
+      if (this.storageFault && req.method !== 'DELETE' && !/^\/api\/profile-runs\/[^/]+\/export$/.test(path)) throw new ApiError(507,'Private storage capacity exhausted; delete saved history or contact the operator');
       if (['POST','DELETE'].includes(req.method) && !this.allowOrigin(req)) throw new ApiError(403,'Same-origin or configured public origin required');
       if (path === '/api/workspaces') {
         if (req.method !== 'POST') throw new ApiError(405,'POST required'); if (!this.workspaceCreation.take()) throw new ApiError(429,'Workspace creation rate budget exhausted');
@@ -169,7 +171,7 @@ export class Profiler {
       const owner = this.auth(req);
       if (path === '/api/workspaces/current') {
         if (req.method !== 'DELETE') throw new ApiError(405,'DELETE required');
-        await Promise.all([...this.jobs.values()].filter(j=>j.owner===owner).map(j=>this.stop(j,'interrupted','workspace_deleted'))); this.store.deleteWorkspace(owner); this.workspaceBudget.delete(owner); send(res,204); return true;
+        await Promise.all([...this.jobs.values()].filter(j=>j.owner===owner).map(j=>this.stop(j,'interrupted','workspace_deleted'))); this.store.deleteWorkspace(owner); if(this.storageFault){this.store.recover(new Set(this.jobs.keys()));this.storageFault = false;} this.workspaceBudget.delete(owner); send(res,204); return true;
       }
       if (path === '/api/profile-runs') {
         if (req.method === 'POST') send(res,201,await this.create(owner,await readJSON(req)));
@@ -179,11 +181,11 @@ export class Profiler {
       const parts = /^\/api\/profile-runs\/([^/]+)(?:\/(stream|export))?$/.exec(path);
       if (!parts || !UUID.test(parts[1])) throw new ApiError(404,'Run not found');
       const id = parts[1], stored = this.store.get(owner,id); if(!stored)throw new ApiError(404,'Run not found'); const job=this.jobs.get(id);
-      if (req.method === 'DELETE' && !parts[2]) { if(job)await this.stop(job,'interrupted','run_deleted');this.store.deleteRun(owner,id);send(res,204);return true; }
+      if (req.method === 'DELETE' && !parts[2]) { if(job)await this.stop(job,'interrupted','run_deleted');this.store.deleteRun(owner,id);if(this.storageFault){this.store.recover(new Set(this.jobs.keys()));this.storageFault = false;}send(res,204);return true; }
       if (req.method !== 'GET') throw new ApiError(405,'GET or DELETE required');
       if(parts[2]==='stream'){if(!job)throw new ApiError(409,'Stream is single-use or no longer available');this.stream(job,req,res);return true;}
-      const report=job?this.snapshot(job):stored;if(parts[2]==='export')res.setHeader('content-disposition',`attachment; filename="stopline-${id}.json"`);send(res,200,report);return true;
-    } catch(error) { if(res.headersSent)res.destroy();else send(res,error instanceof ApiError?error.status:(error.code==='ERR_SQLITE_ERROR' && /full/i.test(error.message)?507:503),{error:error instanceof ApiError?error.message:'Private workspace storage is unavailable'}); return true; }
+      const report=job?this.snapshot(job):stored;if(this.storageFault && !report.terminal)throw new ApiError(507,'Run persistence could not be confirmed');if(parts[2]==='export')res.setHeader('content-disposition',`attachment; filename="stopline-${id}.json"`);send(res,200,report);return true;
+    } catch(error) { if(error.code==='ERR_SQLITE_ERROR' && /full/i.test(error.message)) this.storageFault = true; if(res.headersSent)res.destroy();else send(res,error instanceof ApiError?error.status:(error.code==='ERR_SQLITE_ERROR' && /full/i.test(error.message)?507:503),{error:error instanceof ApiError?error.message:'Private workspace storage is unavailable'}); return true; }
   }
   async close() { if(this.shutdown)return this.shutdown; this.closing=true;this.shutdown=(async()=>{await Promise.allSettled([...this.admissionTasks]);await Promise.all([...this.jobs.values()].map(job=>this.stop(job,'interrupted','server_shutdown')));this.store.close();})();return this.shutdown; }
 }

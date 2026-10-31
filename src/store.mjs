@@ -21,11 +21,13 @@ export class RunStore {
     this.directory = secureDirectory(directory); const file = join(this.directory, 'stopline.sqlite');
     try { if (lstatSync(file).isSymbolicLink()) throw new Error('Database symlinks are refused'); } catch (e) { if (e.code !== 'ENOENT') throw e; }
     this.db = new DatabaseSync(file); chmodSync(file, 0o600);
-    this.db.exec('PRAGMA page_size=4096; PRAGMA max_page_count=32768; PRAGMA journal_size_limit=8388608; PRAGMA wal_autocheckpoint=128; PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=2000; PRAGMA secure_delete=ON;');
+    this.db.exec('PRAGMA page_size=4096; PRAGMA max_page_count=32768; PRAGMA journal_size_limit=8388608; PRAGMA wal_autocheckpoint=128; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=2000; PRAGMA secure_delete=ON;');
     if (this.db.prepare('PRAGMA max_page_count').get().max_page_count > 32768) { this.db.close(); this.db = null; throw new Error('Existing database exceeds configured page ceiling'); }
     this.db.exec(`CREATE TABLE IF NOT EXISTS workspaces (owner TEXT PRIMARY KEY, created INTEGER NOT NULL, seen INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS runs (id TEXT PRIMARY KEY, owner TEXT NOT NULL REFERENCES workspaces(owner) ON DELETE CASCADE, created INTEGER NOT NULL, status TEXT NOT NULL, report TEXT NOT NULL);
-      CREATE INDEX IF NOT EXISTS owner_runs ON runs(owner,created);`);
+      CREATE INDEX IF NOT EXISTS owner_runs ON runs(owner,created);
+      CREATE TABLE IF NOT EXISTS storage_probe(id INTEGER PRIMARY KEY CHECK(id=1), value INTEGER NOT NULL);
+      INSERT OR IGNORE INTO storage_probe VALUES(1,0);`);
     this.prune();
     for (const row of this.db.prepare("SELECT id,owner,report FROM runs WHERE status IN ('queued','running','settling')").all()) {
       const r = JSON.parse(row.report); r.status = 'interrupted'; r.terminal = true; r.stopReason = 'process_restart'; r.error = 'Run interrupted by a process restart'; r.cleanup = { activeRequest: false, activeTimers: 0 }; r.completedAt = new Date().toISOString();
@@ -62,6 +64,15 @@ export class RunStore {
     }
     if (count >= 100) throw new Error('Workspace saved run capacity reached');
     if (this.db.prepare('SELECT count(*) AS n FROM runs').get().n >= 10000) throw new Error('Saved run capacity reached');
+  }
+  recover(activeIds = new Set()) {
+    for (const row of this.db.prepare("SELECT id,owner,report FROM runs WHERE status IN ('queued','running','settling')").all()) {
+      if (activeIds.has(row.id)) continue;
+      const report = JSON.parse(row.report); report.status = 'interrupted'; report.terminal = true; report.stopReason = 'storage_recovery'; report.error = 'Persistence failed during the previous run'; report.cleanup = { activeRequest: false, activeTimers: 0 }; report.completedAt = new Date().toISOString(); this.save(row.owner,report);
+    }
+    this.db.prepare('UPDATE storage_probe SET value=value+1 WHERE id=1').run();
+    const checkpoint = this.db.prepare('PRAGMA wal_checkpoint(FULL)').get();
+    if (checkpoint.busy) throw new Error('Storage durability checkpoint is busy');
   }
   get(owner, id) { const row = this.db.prepare('SELECT report FROM runs WHERE owner=? AND id=?').get(owner, id); return row ? JSON.parse(row.report) : null; }
   list(owner) { return this.db.prepare('SELECT report FROM runs WHERE owner=? ORDER BY created DESC LIMIT 100').all(owner).map(r => { const { events, ...report } = JSON.parse(r.report); return report; }); }
