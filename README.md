@@ -27,7 +27,9 @@ The `propagate` policy attaches an `AbortController` to the proxy's outgoing HTT
 
 A cooperative provider aborts its active timer when its response connection closes early. A noncooperative provider observes the closure but deliberately completes all scheduled units. This negative control makes the boundary visible: **closing a socket does not prove remote computation or billing stopped.**
 
-Provider errors destroy the stream and reach the client as an error, rather than a false successful completion. Shutdown aborts controllers, clears tracked application timers, waits for jobs and socket close events, and closes both listening servers. Node's internal resources are not exhaustively instrumented; the report inventories the resources explicitly owned by this lab.
+Provider errors destroy the stream and reach the client as an error, rather than a false successful completion. Shutdown stops new connections, aborts controllers, clears tracked application timers, and waits for jobs, socket close events, and both listening servers. Concurrent `close()` callers receive the same shutdown promise, so each observes completed cleanup. Node's internal resources are not exhaustively instrumented; the report inventories the resources explicitly owned by this lab.
+
+The default idle-settlement deadline derives from the configured initial delay and per-unit interval, with a minimum five-second budget and additional cleanup allowance. Accepted long-delay fixtures are not incorrectly cut off by a fixed five-second timeout. Callers can explicitly supply a shorter deadline to `waitForIdle()` when testing timeout behavior.
 
 ## Recorded experiment
 
@@ -60,7 +62,7 @@ An absence of observed cancellation is not treated as zero cost. The fixture has
 
 ## Verification
 
-Nine meaningful tests cover:
+Eleven meaningful tests cover:
 
 - Normal stream completion over both HTTP connections.
 - Midstream cancellation compared against the naive policy.
@@ -70,6 +72,8 @@ Nine meaningful tests cover:
 - Provider/proxy pause-and-drain backpressure with large chunks.
 - Cancellation while backpressure is active.
 - Idempotent shutdown while work is still pending.
+- Concurrent shutdown calls waiting for the same completed cleanup.
+- A valid six-second initial-delay fixture completing after early client cancellation.
 - Invalid fixture configuration.
 
 Cleanup tests inspect actual socket close events as well as application counters. Tests avoid requiring a fixed cancellation latency or exact in-flight unit count. GitHub Actions configuration runs tests and a one-repetition CLI comparison; it has not been executed remotely as part of this local implementation.
