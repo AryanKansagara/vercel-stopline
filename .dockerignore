@@ -7,3 +7,6 @@ scripts
 .env
 .env.*
 **/*.test.mjs
+
+.data
+*.sqlite*

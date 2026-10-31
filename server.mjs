@@ -5,6 +5,7 @@ import { readFile, realpath, stat } from 'node:fs/promises';
 import { resolve, relative, extname, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createLab } from './src/lab.mjs';
+import { Profiler } from './src/profiler.mjs';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const TERMINAL = new Set(['completed', 'cancelled', 'expired', 'failed', 'timeout', 'shutdown']);
@@ -51,7 +52,7 @@ async function body(request) {
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon' };
 
 export async function createApp({ host = '127.0.0.1', port = 0, webRoot = resolve(ROOT, 'web'),
-  publicOrigin = process.env.PUBLIC_ORIGIN, limits = {} } = {}) {
+  publicOrigin = process.env.PUBLIC_ORIGIN, dataDir = process.env.DATA_DIR ?? resolve(ROOT, '.data'), profilerDependencies = {}, limits = {} } = {}) {
   // Validate configuration before creating any listener or job resources.
   const allowedPublicOrigin = validatePublicOrigin(publicOrigin);
   // Overrides are for deterministic local tests only, and cannot relax production ceilings.
@@ -62,7 +63,10 @@ export async function createApp({ host = '127.0.0.1', port = 0, webRoot = resolv
   if (Object.keys(settings).length !== 6) throw new Error('Unknown limit');
   const jobs = new Map(), sockets = new Set();
   let accepting = true, shutdownPromise, tokens = settings.createsPerMinute, refilledAt = Date.now();
-  const active = () => [...jobs.values()].filter(job => !TERMINAL.has(job.status)).length;
+  const legacyActive = () => [...jobs.values()].filter(job => !TERMINAL.has(job.status)).length;
+  const allowOrigin = request => !request.headers.origin || request.headers.origin === allowedPublicOrigin || request.headers.origin === `http://${request.headers.host}` || request.headers.origin === `https://${request.headers.host}`;
+  const profiler = new Profiler({ dataDir, otherActive: legacyActive, allowOrigin, dependencies: profilerDependencies });
+  const active = () => legacyActive() + profiler.activeCount();
   const report = job => ({ id: job.id, status: job.status, terminal: TERMINAL.has(job.status), configuration: job.configuration,
     metrics: job.lab?.snapshot() ?? null, events: job.lab ? [...job.lab.events] : [], cleanup: job.cleanup,
     error: job.error, createdAt: job.createdAt, cleanupForced: job.cleanupForced,
@@ -176,13 +180,14 @@ export async function createApp({ host = '127.0.0.1', port = 0, webRoot = resolv
     response.writeHead(200, { 'content-type': type, 'content-length': info.size, 'cache-control': 'no-cache' });
     response.end(content);
   }
-  const server = http.createServer({ maxHeaderSize: 8192, requestTimeout: 5000, headersTimeout: 5000, keepAliveTimeout: 2000 }, async (request, response) => {
+  const server = http.createServer({ maxHeaderSize: 32768, requestTimeout: 5000, headersTimeout: 5000, keepAliveTimeout: 2000 }, async (request, response) => {
     request.on('error', () => {});
     response.on('error', () => {});
     response.setHeader('x-content-type-options', 'nosniff');
     response.setHeader('referrer-policy', 'no-referrer');
     response.setHeader('content-security-policy', "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'");
     try {
+      if (request.rawHeaders.length > 128) throw new HttpError(431, 'Too many headers');
       const rawPath = (request.url ?? '/').split('?')[0];
       if (!rawPath.startsWith('/') || rawPath.startsWith('//') || /\\|\0/.test(rawPath)) throw new HttpError(400, 'Invalid request path');
       if (rawPath === '/healthz' && request.method === 'GET') return json(response, 200, { ok: true });
@@ -191,8 +196,9 @@ export async function createApp({ host = '127.0.0.1', port = 0, webRoot = resolv
         const index = await realpath(resolve(webRoot, 'index.html')).catch(() => null);
         const confined = root && index && !relative(root, index).startsWith('..') && !relative(root, index).startsWith('/');
         const assets = Boolean(confined && await stat(index).then(s => s.isFile() && s.size <= 2 * 1024 * 1024, () => false));
-        return json(response, accepting && assets ? 200 : 503, { ready: accepting && assets, activeJobs: active(), retainedJobs: jobs.size });
+        return json(response, accepting && assets && profiler.ready() ? 200 : 503, { ready: accepting && assets && profiler.ready(), activeJobs: active(), retainedJobs: jobs.size });
       }
+      if (await profiler.handle(request, response, rawPath)) return;
       prune();
       if (rawPath === '/api/runs') {
         if (request.method !== 'POST') throw new HttpError(405, 'POST required');
@@ -234,9 +240,10 @@ export async function createApp({ host = '127.0.0.1', port = 0, webRoot = resolv
       json(response, status, { error: error instanceof HttpError ? error.message : 'Request could not be completed' }, [408, 413, 415].includes(status) ? { connection: 'close' } : {});
     }
   });
+  server.maxHeadersCount = 0;
   server.on('connection', socket => { sockets.add(socket); socket.once('close', () => sockets.delete(socket)); });
   server.on('clientError', (_error, socket) => { socket.end('HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n'); });
-  await new Promise((ok, fail) => { server.once('error', fail); server.listen(port, host, () => { server.off('error', fail); ok(); }); });
+  try { await new Promise((ok, fail) => { server.once('error', fail); server.listen(port, host, () => { server.off('error', fail); ok(); }); }); } catch (error) { await profiler.close(); throw error; }
   const address = server.address();
   return { server, url: `http://${host === '0.0.0.0' ? '127.0.0.1' : host}:${address.port}`,
     diagnostics: () => ({ accepting, activeJobs: active(), retainedJobs: jobs.size, openSockets: sockets.size }),
@@ -244,7 +251,7 @@ export async function createApp({ host = '127.0.0.1', port = 0, webRoot = resolv
       if (!shutdownPromise) shutdownPromise = (async () => {
         accepting = false;
         const stopped = new Promise(ok => server.close(ok));
-        await Promise.allSettled([...jobs.values()].map(job => force(job, 'shutdown')));
+        await Promise.allSettled([profiler.close(), ...[...jobs.values()].map(job => force(job, 'shutdown'))]);
         for (const job of jobs.values()) { clearTimeout(job.queuedTimer); clearTimeout(job.deadlineTimer); }
         const closed = [...sockets].map(socket => new Promise(ok => { if (socket.closed) { sockets.delete(socket); return ok(); } socket.once('close', ok); socket.destroy(); }));
         server.closeAllConnections(); await Promise.all(closed); await stopped;
@@ -253,12 +260,14 @@ export async function createApp({ host = '127.0.0.1', port = 0, webRoot = resolv
     },
   };
 }
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+export async function main() {
   const port = Number(process.env.PORT ?? 3000);
   if (!Number.isInteger(port) || port < 0 || port > 65535) throw new Error('PORT must be integer 0..65535');
   const app = await createApp({ host: '0.0.0.0', port });
-  console.log(JSON.stringify({ event: 'listening', url: app.url, fixture: true }));
+  console.log(JSON.stringify({ event: 'listening', url: app.url, product: true }));
   let stopping = false;
   const stop = () => { if (stopping) return; stopping = true; void app.close().then(() => { process.exitCode = 0; }, () => { process.exitCode = 1; }); };
   process.once('SIGTERM', stop); process.once('SIGINT', stop);
 }
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();

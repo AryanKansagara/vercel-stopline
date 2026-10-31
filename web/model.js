@@ -1,61 +1,61 @@
-/** Pure presentation decisions; values originate in the lab, never simulated here. */
+/** Presentation uses observed proxy evidence, never inferred provider computation. */
 export const nonnegative = value => Number.isFinite(value) && value >= 0 ? value : null;
-export function cleanResources(snapshot) {
-  return Boolean(snapshot) && ['activeProviderJobs', 'activeProxyRequests', 'activeTimers', 'openSockets', 'listeningServers']
-    .every(key => snapshot[key] === 0);
-}
 
-export function outcomeFor(run) {
-  if (!run) return { tone: 'idle', title: 'Ready when you are', description: 'The counters and timeline will populate with observed server events.' };
-  if (run.phase === 'creating') return { tone: 'active', title: 'Opening a new experiment', description: 'Creating the run and connecting your browser to its one-use stream.' };
-  if (run.creationError) return { tone: 'error', title: 'The run could not start', description: run.creationError };
-  if (run.observationError) return { tone: 'warning', title: 'Observation interrupted', description: run.observationError + ' Cleanup has not been confirmed. Download the last available evidence or try a new run.' };
-  const server = run.latest, metrics = server?.metrics;
-  if (server?.cleanupForced) return { tone: 'warning', title: 'Safety cleanup stopped this run', description: `The server reached a ${server.status === 'timeout' ? 'deadline' : 'safety limit'}. Forced cleanup is not evidence that the chosen cancellation policy stopped work.` };
-  if (server && ['failed', 'timeout', 'shutdown', 'expired'].includes(server.status))
-    return { tone: 'error', title: 'The server ended this experiment', description: server.error || `Server status: ${server.status}. The recorded evidence is available below.` };
-  if (run.cancelRequested) {
-    if (!run.streamDone) return { tone: 'active', title: 'Closing the client connection', description: 'AbortController has been signaled. Waiting for the stream reader to close.' };
-    if (metrics?.providerCancellationObserved && !server?.cleanupForced)
-      return { tone: 'success', title: 'Cancellation reached the provider', description: `${metrics.providerUnitsAfterCancel ?? 0} work units observed after client close. ${server.terminal && cleanResources(server.cleanup) ? 'Provider work settled and resource cleanup is confirmed.' : 'Watching the remaining resources settle.'}` };
-    if (metrics?.activeProviderJobs > 0) return { tone: 'warning', title: 'Client stopped. Provider still working.', description: `${metrics.providerUnitsAfterCancel ?? 0} additional units observed after the client closed. The timeline continues until work and cleanup settle.` };
-    if (server?.terminal) return { tone: 'warning', title: 'Client stopped. Provider work finished.', description: `${metrics?.providerUnitsAfterCancel ?? 0} units observed after client close. No policy-driven provider cancellation was observed.${cleanResources(server.cleanup) ? ' Resource cleanup is confirmed.' : ''}` };
-    return { tone: 'active', title: 'Client closed. Following the work.', description: 'Polling observed server metrics to distinguish cancellation from work that continues upstream.' };
-  }
-  if (run.streamError) return { tone: 'error', title: 'The stream was interrupted', description: `${run.streamError} Server observations continue so cleanup can be verified.` };
-  if (server?.terminal) return { tone: cleanResources(server.cleanup) ? 'success' : 'warning', title: 'Run complete', description: `${metrics?.providerUnits ?? 0} provider units observed. ${cleanResources(server.cleanup) ? 'All experiment resources have settled and closed.' : 'The final cleanup snapshot has not confirmed zero active resources.'}` };
-  return { tone: 'active', title: run.receivedUnits ? 'The stream is live' : 'Waiting for the first work unit', description: run.receivedUnits ? 'Cancel the stream to observe whether provider work stops or continues.' : 'The real HTTP connection is open. Initial delay and scheduling affect when data arrives.' };
-}
+export const validToken = value => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
 
-export class UnitLines {
-  constructor(totalUnits) { this.pending = ''; this.lastUnit = 0; this.totalUnits = totalUnits; }
-  push(text) {
-    this.pending += text;
-    if (this.pending.length > 16384) throw new Error('Stream line exceeded the browser display limit.');
-    const lines = [];
-    let split;
-    while ((split = this.pending.indexOf('\n')) >= 0) {
-      const raw = this.pending.slice(0, split);
-      this.pending = this.pending.slice(split + 1);
-      const match = /^(\d{1,4}):x{1,4096}$/.exec(raw);
-      if (!match || Number(match[1]) !== this.lastUnit + 1 || Number(match[1]) > this.totalUnits)
-        throw new Error('The stream did not match the controlled work-unit contract.');
-      this.lastUnit = Number(match[1]);
-      lines.push({ unit: this.lastUnit, raw });
-    }
-    return lines;
-  }
-  finish() { if (this.pending) throw new Error('The stream ended in the middle of a work unit.'); }
-}
+export function bytes(value) { const n=nonnegative(value);
+ if(n===null)return '—';
+ if(n<1024)return `${n.toLocaleString()} B`;
+ if(n<1048576)return `${(n/1024).toFixed(1)} KB`;
+return `${(n/1048576).toFixed(2)} MB`;
+ }
+export const milliseconds = value => nonnegative(value)===null?'—':`${Math.round(value).toLocaleString()} ms`;
 
-export function checkedRunLinks(value, origin) {
-  if (!value || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(value.id ?? ''))
-    throw new Error('The server returned an invalid run identifier.');
-  const base = `/api/runs/${value.id}`;
-  for (const [field, path] of [['streamUrl', `${base}/stream`], ['statusUrl', base]]) {
-    const url = new URL(value[field], origin);
-    if (url.origin !== origin || url.pathname !== path || url.search || url.hash)
-      throw new Error('The server returned an unexpected experiment URL.');
-  }
-  return { id: value.id, streamUrl: `${base}/stream`, statusUrl: base };
+export function rate(metrics) { const b=nonnegative(metrics?.bytesReceived),d=nonnegative(metrics?.durationMs);
+return b===null||!d||!Number.isFinite(b/d*1000)?'—':`${bytes(b/d*1000)}/s`;
+ }
+export function endpointError(value) { try { const u=new URL(value);
+if(u.protocol!=='https:'||(u.port&&u.port!=='443'))return 'Use a public HTTPS URL on port 443.';
+if(u.username||u.password||u.hash)return 'URL credentials and fragments are not supported.';
+for(const key of u.searchParams.keys())if(/token|key|auth|password|secret|signature|credential/i.test(key))return 'Put credentials in the ephemeral API key field, not URL parameters.';
+return '';
+}catch{return 'Enter a complete HTTPS endpoint URL.';
+} }
+export function checkedRunLinks(value,origin) {if(!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(value?.id??''))throw Error('Invalid report identifier returned.');
+const base=`/api/profile-runs/${value.id}`;
+for(const [key,path]of[['streamUrl',base+'/stream'],['statusUrl',base]]){const u=new URL(value[key],origin);
+if(u.origin!==origin||u.pathname!==path||u.search||u.hash)throw Error('Unexpected report URL returned.');
+}return{id:value.id,streamUrl:base+'/stream',statusUrl:base};
+}
+export function thresholdReached(config,chunks,elapsed) {return (Number.isInteger(config.cancelAfterChunks)&&chunks>=config.cancelAfterChunks)||(Number.isInteger(config.cancelAfterMs)&&elapsed>=config.cancelAfterMs);
+}
+export function cleanResources(value){return value?.activeRequest===false&&value.activeTimers===0;
+}
+const metricKeys=['ttfbMs','bytesReceived','chunksReceived','bytesAfterCancel','chunksAfterCancel','clientCancelledAtMs','upstreamAborted','upstreamClosed','upstreamEnded','durationMs','headersMs','upstreamStatus','upstreamAbortRequested'];
+
+export function safeReport(report) {const c=report.configuration??{},configuration={};
+for(const k of ['mode','policy','cancelAfterChunks','cancelAfterMs','model','maxTokens','promptLength'])if(['string','number','boolean'].includes(typeof c[k])||c[k]===null)configuration[k]=c[k];
+try{const u=new URL(c.endpoint);
+u.username='';
+u.password='';
+for(const key of [...u.searchParams.keys()])if(/token|key|auth|password|secret|signature|credential/i.test(key))u.searchParams.delete(key);
+u.hash='';
+configuration.endpoint=u.toString();
+}catch{configuration.endpoint='Unavailable';
+}const metrics={};
+for(const k of metricKeys){const v=report.metrics?.[k];
+metrics[k]=typeof v==='boolean'?v:nonnegative(v);
+}return{id:String(report.id??''),status:String(report.status??'unknown'),terminal:report.terminal===true,createdAt:report.createdAt,startedAt:report.startedAt,observability:{providerCompute:'not observable',providerBilling:'not observable',responseBodiesPersisted:false},configuration,metrics,events:(Array.isArray(report.events)?report.events:[]).slice(0,1000).map(e=>({sequence:nonnegative(e.sequence),atMs:nonnegative(e.atMs),kind:String(e.kind??'event').slice(0,100),...(nonnegative(e.bytes)!==null?{bytes:e.bytes}:{})})),cleanup:report.cleanup?{activeRequest:report.cleanup.activeRequest,activeTimers:nonnegative(report.cleanup.activeTimers)}:null,error:report.error?String(report.error).slice(0,500):null};
+}
+export function outcomeFor(run) {if(!run)return{tone:'idle',title:'A useful profile starts with your endpoint.',description:'Nothing runs until you start a profile. Metrics and lifecycle events come from the actual request.'};
+if(run.error)return{tone:'error',title:'Observation needs attention',description:run.error+' Provider work and cleanup cannot be inferred.'};
+const s=run.latest,m=s?.metrics;
+if(s&&['error','timeout','interrupted'].includes(s.status))return{tone:'warning',title:`Profile ${s.status}`,description:s.error||'The request ended at an operational limit. Inspect the recorded connection events.'};
+if(m?.clientCancelledAtMs!==null&&nonnegative(m?.clientCancelledAtMs)!==null){if(m.upstreamAborted)return{tone:'success',title:'Upstream abort observed',description:'The proxy aborted its upstream connection. Internal provider computation and billing remain unobservable.'};
+if(m.bytesAfterCancel>0)return{tone:s.terminal?'warning':'active',title:s.terminal?'Post-disconnect evidence saved':'Still observing upstream',description:`${bytes(m.bytesAfterCancel)} arrived at the proxy after the client disconnected. This measures received data, not provider computation.`};
+return{tone:s?.terminal?'success':'active',title:s?.terminal?'Disconnected profile saved':'Following the upstream connection',description:'The proxy observed the client disconnect. Waiting for connection lifecycle evidence does not establish provider work stopped.'};
+}if(s?.terminal)return{tone:'success',title:'Profile completed',description:'The connection ended before a cancellation was observed. Actual timings, bytes and events are saved.'};
+if(run.streamError)return{tone:'warning',title:'Browser stream interrupted',description:run.streamError+' Proxy observations are shown separately; a stream error does not prove provider cancellation.'};
+if(run.cancelRequested)return{tone:'active',title:'Client stream closed',description:'Waiting for the proxy to confirm the disconnect and upstream connection state.'};
+return{tone:'active',title:run.browserChunks?'Receiving the actual response':'Connecting to your endpoint',description:'The browser preview is ephemeral. The proxy records timing and byte evidence in your private report.'};
 }

@@ -16,11 +16,15 @@ export async function GET(request) {
   let url;
   try { url = new URL(request.url); } catch { return error(400, 'Invalid stream request'); }
   const ids = url.searchParams.getAll('runId');
-  if (ids.length !== 1 || !UUID.test(ids[0]) || [...url.searchParams.keys()].some(key => key !== 'runId')) return error(400, 'One valid runId is required');
+  if (ids.length !== 1 || !UUID.test(ids[0]) || [...url.searchParams.keys()].some(key => key !== 'runId' && key !== 'product')) return error(400, 'One valid runId is required');
+  const product = url.searchParams.has('product');
+  if (product && (url.searchParams.getAll('product').length !== 1 || url.searchParams.get('product') !== '1')) return error(400, 'Invalid product selector');
+  const authorization = request.headers.get('authorization');
+  if (product && !/^Bearer [0-9a-f]{64}$/.test(authorization ?? '')) return error(401, 'Private workspace token required');
   if (request.signal.aborted) return error(499, 'Client disconnected');
   try {
-    const upstream = await fetch(`${BACKEND_ORIGIN}/api/runs/${ids[0]}/stream`, {
-      method: 'GET', signal: request.signal, redirect: 'error', cache: 'no-store', headers: { accept: 'text/plain' },
+    const upstream = await fetch(`${BACKEND_ORIGIN}/api/${product ? "profile-runs" : "runs"}/${ids[0]}/stream`, {
+      method: 'GET', signal: request.signal, redirect: 'error', cache: 'no-store', headers: { accept: 'text/plain', ...(product ? {authorization} : {}) },
     });
     // Pass the live ReadableStream through. Never text(), json(), buffer, or drain on disconnect.
     return new Response(upstream.body, {

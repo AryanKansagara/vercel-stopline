@@ -1,122 +1,381 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f5f6fb">
-  <meta name="description" content="A real HTTP streaming playground for observing cancellation propagation and cleanup with a controlled workload.">
-  <title>StopLine — Follow the work</title>
-  <script src="/theme.js"></script>
-  <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="/themes.css">
-  <script type="module" src="/app.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f5f6fb">
+<meta name="description" content="Profile real streaming endpoints, observe cancellation boundaries, and compare private saved reports.">
+<title>StopLine — Streaming endpoint profiler</title>
+<script src="/theme.js">
+</script>
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/themes.css">
+<script type="module" src="/app.js">
+</script>
 </head>
 <body>
-  <a class="skip-link" href="#playground">Skip to playground</a>
-  <header class="site-header">
-    <div class="header-inner">
-      <a class="wordmark" href="#top" aria-label="StopLine home"><span class="brand-icon" aria-hidden="true"><i></i><i></i></span>stopline<span class="brand-dot">.</span></a>
-      <nav aria-label="Main navigation">
-        <a class="nav-active" href="#playground">Playground</a>
-        <a href="#how-it-works">How it works <span aria-hidden="true">↗</span></a>
-      </nav>
-      <div class="header-actions">
-        <label class="theme-control" for="color-theme">
-          <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4L19 5"/></svg>
-          <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.6A8.8 8.8 0 0 1 8.4 4 9 9 0 1 0 20 15.6Z"/></svg>
-          <span class="sr-only">Color theme</span>
-          <select id="color-theme" aria-describedby="theme-status"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
-        </label>
-        <span id="theme-status" class="sr-only" role="status" aria-live="polite">Theme follows your system setting.</span>
-        <a class="source-link" href="https://github.com/AryanKansagara/vercel-stopline" target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4 1-4-2-6-2m12 4v-3.4a3 3 0 0 0-.8-2.3c2.7-.3 5.6-1.3 5.6-6A4.7 4.7 0 0 0 18.5 6a4.3 4.3 0 0 0-.1-3s-1-.3-3.4 1.3a11.7 11.7 0 0 0-6 0C6.6 2.7 5.6 3 5.6 3a4.3 4.3 0 0 0-1.3 3.3c0 4.7 2.9 5.7 5.6 6a3 3 0 0 0-.8 2.3V21"/></svg><span>Source code</span></a>
-      </div>
-    </div>
-  </header>
-
-  <main id="top">
-    <section class="hero" aria-labelledby="page-title">
-      <div class="hero-copy">
-        <div class="eyebrow"><span class="small-dot"></span> A STREAM LIFECYCLE LAB</div>
-        <h1 id="page-title">Close the stream.<br><span>Follow the work.</span></h1>
-        <p>A disconnect is just the beginning. Watch what happens to upstream work when you cancel a real HTTP stream.</p>
-        <div class="scope-tag"><span aria-hidden="true">◇</span> Controlled workload. Observable consequences.</div>
-      </div>
-      <div class="flow-card" aria-label="The experiment connects a browser client through a proxy to a controlled provider">
-        <div class="flow-card-top"><span>THE REQUEST PATH</span><span class="live-label"><i></i> REAL HTTP</span></div>
-        <div class="request-flow">
-          <div class="flow-node"><span class="flow-icon client-icon" aria-hidden="true">⌘</span><strong>Client</strong><small>Your browser</small></div>
-          <span class="flow-wire" aria-hidden="true"><i></i>→</span>
-          <div class="flow-node"><span class="flow-icon proxy-icon" aria-hidden="true">⇄</span><strong>Proxy</strong><small>Abort policy</small></div>
-          <span class="flow-wire" aria-hidden="true"><i></i>→</span>
-          <div class="flow-node"><span class="flow-icon provider-icon" aria-hidden="true">▦</span><strong>Provider</strong><small>Work generator</small></div>
-        </div>
-        <div class="flow-card-note"><span aria-hidden="true">↳</span> Cancel downstream. Observe upstream.</div>
-      </div>
-    </section>
-
-    <section id="playground" class="playground" aria-labelledby="playground-title">
-      <div class="section-heading"><div><span class="section-index">01 /</span><h2 id="playground-title">The playground</h2></div><span class="experiment-tag">NO KEYS · NO MODEL CALLS</span></div>
-      <div class="workspace">
-        <aside class="configuration panel" aria-label="Run configuration">
-          <div class="panel-title"><span class="settings-icon" aria-hidden="true">⊙</span><h3>Configure a run</h3></div>
-          <p class="panel-intro">Choose how the proxy and provider respond to a disconnect.</p>
-          <form id="run-form">
-            <fieldset id="configuration-fields" class="configuration-fields">
-              <legend class="sr-only">Experiment settings</legend>
-              <fieldset class="policy-group">
-                <legend><span class="control-number">1</span> Cancellation policy</legend>
-                <label class="policy-option"><input type="radio" name="policy" value="propagate" checked><span><strong>Propagate abort <em>RECOMMENDED</em></strong><small>Forward the disconnect upstream.</small></span></label>
-                <label class="policy-option"><input type="radio" name="policy" value="naive"><span><strong>Close client only</strong><small>Keep draining the upstream stream.</small></span></label>
-              </fieldset>
-              <fieldset class="behavior-group">
-                <legend><span class="control-number">2</span> Provider behavior</legend>
-                <div class="segmented-control">
-                  <label><input type="radio" name="providerBehavior" value="cooperative" checked><span>Cooperative</span></label>
-                  <label><input type="radio" name="providerBehavior" value="noncooperative"><span>Keeps working</span></label>
-                </div>
-                <p id="behavior-help" class="control-help">Stops generating when its connection closes.</p>
-              </fieldset>
-              <div class="range-control"><label for="total-units">Work units</label><output id="units-output" for="total-units">48 units</output><input id="total-units" name="totalUnits" type="range" min="1" max="60" value="48" step="1"><div class="range-limits"><span>1 unit</span><span>60 units</span></div></div>
-              <div class="range-control"><label for="interval">Interval between units</label><output id="interval-output" for="interval">120 ms</output><input id="interval" name="intervalMs" type="range" min="10" max="150" value="120" step="10"><div class="range-limits"><span>10 ms</span><span>150 ms</span></div></div>
-              <div class="delay-control"><label for="initial-delay">Initial delay <span>before first unit</span></label><div><input id="initial-delay" name="initialDelayMs" type="number" min="0" max="500" step="1" value="250" inputmode="numeric"><span aria-hidden="true">ms</span></div></div>
-            </fieldset>
-            <button id="run-button" class="button button-primary" type="submit"><span class="play-icon" aria-hidden="true"></span><span id="run-label">Start streaming</span><span aria-hidden="true">↗</span></button>
-            <button id="cancel-button" class="button button-cancel" type="button" disabled><span class="stop-icon" aria-hidden="true"></span>Cancel stream</button>
-          </form>
-          <div class="configuration-footer"><span class="tiny-lock" aria-hidden="true">♧</span> Bounded synthetic work. Real connections.</div>
-        </aside>
-
-        <div class="results-area">
-          <div class="metrics" aria-label="Observed run counters">
-            <div class="metric"><span class="metric-label">Client received <span aria-hidden="true">↙</span></span><strong id="received-count">0</strong><small>complete stream lines</small></div>
-            <div class="metric"><span class="metric-label">Before cancel</span><strong id="before-count">—</strong><small>observed provider units</small></div>
-            <div class="metric metric-after"><span class="metric-label">After cancel <span aria-hidden="true">↗</span></span><strong id="after-count">—</strong><small>units after client close</small></div>
-            <div class="metric"><span class="metric-label">Abort forwarded</span><strong id="abort-count">—</strong><small>observed proxy aborts</small></div>
-          </div>
-          <section class="stream-panel" aria-labelledby="stream-title">
-            <div class="console-heading"><div><span class="terminal-icon" aria-hidden="true">›_</span><h3 id="stream-title">Response stream</h3></div><span id="connection-badge" class="connection-badge"><i></i>Idle</span></div>
-            <div id="stream-output" class="console-body" role="region" aria-label="Actual response stream text" tabindex="0"><div id="empty-console" class="empty-console"><span class="empty-terminal" aria-hidden="true">›_</span><strong>Every stream has a story.</strong><p>Start a run, then cancel to see where the work stops.</p><span class="console-hint">await fetch('/api/runs/…/stream')</span></div></div>
-            <div class="console-footer"><span><i class="console-dot"></i> UTF-8 / text/plain</span><span id="byte-count">0 bytes received</span></div>
-          </section>
-          <div id="outcome" class="outcome outcome-idle"><span id="outcome-icon" aria-hidden="true">◌</span><div><strong id="outcome-title">Ready when you are</strong><p id="outcome-description">The counters and timeline will populate with observed server events.</p></div></div>
-          <section class="timeline-panel panel" aria-labelledby="timeline-title">
-            <div class="timeline-heading"><div><span class="timeline-symbol" aria-hidden="true">⌁</span><h3 id="timeline-title">Event timeline</h3><span id="event-count" class="event-count">0</span></div><label class="unit-events-toggle"><input id="show-unit-events" type="checkbox"> Show work units</label></div>
-            <ol id="event-list" class="event-list" aria-label="Observed server events" tabindex="0"><li class="timeline-empty">Waiting for the first observed event.</li></ol>
-            <div class="cleanup-bar"><span id="cleanup-label"><i class="cleanup-indicator"></i> Cleanup not started</span><span id="cleanup-values">Jobs — &nbsp; Timers — &nbsp; Sockets —</span></div>
-          </section>
-          <div class="evidence-actions"><span id="run-identity" class="run-identity">Evidence stays in this session.</span><div><button id="reset-button" class="text-button" type="button" disabled>Clear run</button><button id="download-button" class="download-button" type="button" disabled><span aria-hidden="true">↓</span> Download JSON</button></div></div>
-        </div>
-      </div>
-      <p id="announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
-      <noscript><p class="noscript">Enable JavaScript to run the real streaming playground.</p></noscript>
-    </section>
-
-    <section id="how-it-works" class="explanation" aria-labelledby="explanation-title">
-      <div class="section-heading"><div><span class="section-index">02 /</span><h2 id="explanation-title">What you're observing</h2></div><span class="quiet-label">A SMALL EXPERIMENT, AN IMPORTANT BOUNDARY</span></div>
-      <div class="explanation-grid"><article><span>01</span><h3>A real disconnect</h3><p>Cancel aborts your browser's streaming fetch. The server observes the connection close.</p></article><article><span>02</span><h3>A policy decision</h3><p>The proxy either forwards the abort or keeps draining the provider's response.</p></article><article><span>03</span><h3>An observed outcome</h3><p>Provider work and resource cleanup remain visible after the client stream has stopped.</p></article></div>
-      <div class="scope-note"><span aria-hidden="true">ⓘ</span><p>This lab generates fictional work units over real HTTP. It measures no AI inference, vendor billing or Vercel deployment behavior. Closing a connection alone does not prove that an external provider stopped work or stopped charging.</p></div>
-    </section>
-  </main>
-  <footer class="site-footer"><span class="footer-wordmark">stopline.</span><span>Less guessing. More evidence.</span><span>Independent engineering experiment <span aria-hidden="true">↗</span></span></footer>
+<a class="skip-link" href="#main-content">Skip to workspace</a>
+<aside class="sidebar" aria-label="Workspace navigation">
+<a class="wordmark" href="#profile" aria-label="StopLine new profile">
+<span class="brand-icon" aria-hidden="true">
+<i>
+</i>
+<i>
+</i>
+</span>stopline<span>.</span>
+</a>
+<div class="sidebar-label">YOUR WORKSPACE</div>
+<nav class="app-nav" aria-label="Main navigation">
+<button class="nav-item active" data-view="profile" aria-current="page">
+<span aria-hidden="true">⌁</span>New profile<span class="nav-shortcut" aria-hidden="true">↗</span>
+</button>
+<button class="nav-item" data-view="history">
+<span aria-hidden="true">◷</span>Saved profiles<span id="history-count" class="nav-count">0</span>
+</button>
+<button class="nav-item" data-view="compare">
+<span aria-hidden="true">⇄</span>Compare runs</button>
+</nav>
+<div class="sidebar-bottom">
+<div class="privacy-icon" aria-hidden="true">◇</div>
+<strong>Your reports, kept private.</strong>
+<p>A browser-held workspace token unlocks your saved profiles. API keys and prompts are never retained.</p>
+<a href="https://github.com/AryanKansagara/vercel-stopline" target="_blank" rel="noreferrer">View source <span aria-hidden="true">↗</span>
+</a>
+</div>
+</aside>
+<div class="main-shell">
+<header class="topbar">
+<div class="breadcrumb">Workspace <span aria-hidden="true">/</span>
+<strong id="view-name">New profile</strong>
+</div>
+<div class="header-actions">
+<span id="workspace-status" class="workspace-status">
+<i>
+</i>Browser workspace</span>
+<label class="theme-control" for="color-theme">
+<svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true">
+<circle cx="12" cy="12" r="4"/>
+<path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4L19 5"/>
+</svg>
+<svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true">
+<path d="M20 15.6A8.8 8.8 0 0 1 8.4 4 9 9 0 1 0 20 15.6Z"/>
+</svg>
+<span class="sr-only">Color theme</span>
+<select id="color-theme" aria-describedby="theme-status">
+<option value="system">System</option>
+<option value="light">Light</option>
+<option value="dark">Dark</option>
+</select>
+</label>
+<span id="theme-status" class="sr-only" role="status" aria-live="polite">Theme follows your system setting.</span>
+</div>
+</header>
+<main id="main-content" tabindex="-1">
+<div id="workspace-message" class="workspace-message" role="status" hidden>
+</div>
+<section id="profile-view" class="view" aria-labelledby="profile-heading">
+<div class="page-heading">
+<div>
+<div class="eyebrow">
+<i>
+</i>STREAMING ENDPOINT PROFILER</div>
+<h1 id="profile-heading">See where your stream stops.</h1>
+<p>Measure a real endpoint. Follow its response through cancellation.<br class="desktop-break">Keep the evidence in your private workspace.</p>
+</div>
+<button id="load-example" class="button button-subtle">
+<span aria-hidden="true">↗</span>Load a GET example</button>
+</div>
+<div class="profile-layout">
+<section class="card request-card" aria-labelledby="request-heading">
+<div class="card-heading">
+<span class="heading-symbol" aria-hidden="true">↗</span>
+<h2 id="request-heading">Request configuration</h2>
+</div>
+<form id="profile-form">
+<fieldset id="request-fields">
+<legend class="sr-only">Endpoint and cancellation settings</legend>
+<fieldset class="mode-control">
+<legend class="sr-only">Request mode</legend>
+<label>
+<input type="radio" name="mode" value="get" checked>
+<span>GET stream</span>
+</label>
+<label>
+<input type="radio" name="mode" value="openai">
+<span>OpenAI compatible</span>
+</label>
+</fieldset>
+<div class="control">
+<label for="endpoint">Endpoint URL <span>required</span>
+</label>
+<input id="endpoint" name="endpoint" type="url" required maxlength="2048" placeholder="https://your-service.com/stream" autocomplete="off" spellcheck="false" aria-describedby="endpoint-help">
+<p id="endpoint-help" class="help">Public HTTPS on port 443. Ordinary query parameters are supported. No URL credentials, secret query parameters or fragments.</p>
+</div>
+<fieldset id="openai-fields" class="openai-fields" disabled hidden>
+<legend class="sr-only">OpenAI compatible request</legend>
+<div class="control">
+<label for="model">Model ID</label>
+<input id="model" name="model" required maxlength="120" placeholder="Your provider's available model" autocomplete="off" spellcheck="false">
+</div>
+<div class="control">
+<label for="prompt">Prompt <span>not saved</span>
+</label>
+<textarea id="prompt" name="prompt" required maxlength="4000" rows="3" placeholder="A short prompt for this profile…" autocomplete="off">
+</textarea>
+</div>
+<div class="two-controls">
+<div class="control">
+<label for="max-tokens">Max output tokens</label>
+<input id="max-tokens" name="maxTokens" type="number" min="1" max="128" step="1" value="64" required>
+</div>
+<div class="control">
+<label for="api-key">API key <span>ephemeral</span>
+</label>
+<input id="api-key" name="apiKey" type="password" required maxlength="4096" placeholder="Provider bearer key" autocomplete="off" spellcheck="false" data-lpignore="true">
+</div>
+</div>
+<p class="request-cost-note">Your provider may charge for this request. A closed connection does not establish that billing stopped.</p>
+</fieldset>
+<fieldset class="policy-group">
+<legend>On client disconnect</legend>
+<label class="policy-option">
+<input type="radio" name="policy" value="propagate" checked>
+<span>
+<strong>Propagate cancellation</strong>
+<small>Abort the upstream connection.</small>
+</span>
+<span class="option-icon" aria-hidden="true">↗</span>
+</label>
+<label class="policy-option">
+<input type="radio" name="policy" value="observe">
+<span>
+<strong>Keep observing upstream</strong>
+<small>Count bytes that arrive after disconnect.</small>
+</span>
+<span class="option-icon" aria-hidden="true">⌁</span>
+</label>
+</fieldset>
+<div class="control">
+<label for="cancel-trigger">Automatically cancel</label>
+<select id="cancel-trigger">
+<option value="chunks">After browser chunks</option>
+<option value="time">After elapsed time</option>
+<option value="first">At the first threshold</option>
+</select>
+</div>
+<div class="two-controls thresholds">
+<div id="chunks-control" class="control">
+<label for="cancel-chunks">Browser chunks</label>
+<input id="cancel-chunks" type="number" min="1" max="100" step="1" value="5" required>
+</div>
+<div id="time-control" class="control" hidden>
+<label for="cancel-ms">Milliseconds</label>
+<input id="cancel-ms" type="number" min="250" max="10000" step="50" value="2000" required disabled>
+</div>
+</div>
+<p class="help threshold-help">Time starts when the stream request opens. Browser chunks are transport observations, not tokens or provider chunks.</p>
+</fieldset>
+<button id="start-profile" class="button button-primary" type="submit">
+<span class="play-icon" aria-hidden="true">
+</span>
+<span id="start-label">Profile endpoint</span>
+<span aria-hidden="true">↗</span>
+</button>
+<button id="cancel-stream" class="button button-outline" type="button" disabled>
+<span class="stop-icon" aria-hidden="true">
+</span>Cancel now</button>
+</form>
+<div class="request-footer">
+<i>
+</i>Real requests. No invented measurements.</div>
+</section>
+<div class="results-column">
+<div class="metric-grid" aria-label="Observed endpoint metrics">
+<div class="metric">
+<span>First byte</span>
+<strong id="metric-ttfb">—</strong>
+<small>upstream TTFB</small>
+</div>
+<div class="metric">
+<span>Bytes received</span>
+<strong id="metric-bytes">—</strong>
+<small>observed by proxy</small>
+</div>
+<div class="metric metric-after">
+<span>After cancel</span>
+<strong id="metric-after">—</strong>
+<small>bytes after disconnect</small>
+</div>
+<div class="metric">
+<span>Average rate</span>
+<strong id="metric-rate">—</strong>
+<small>bytes / run duration</small>
+</div>
+</div>
+<section class="response-card" aria-labelledby="response-heading">
+<div class="console-heading">
+<div>
+<span aria-hidden="true">›_</span>
+<h2 id="response-heading">Live response</h2>
+</div>
+<span id="stream-badge" class="stream-badge">Not connected</span>
+</div>
+<div id="response-output" class="response-output" tabindex="0" role="region" aria-label="Actual response preview">
+<div id="response-placeholder" class="response-placeholder">
+<span class="empty-console-icon" aria-hidden="true">⌁</span>
+<h3>Your endpoint. Your evidence.</h3>
+<p>Enter a public streaming URL to capture real timing,<br>response bytes and connection events.</p>
+<div class="empty-steps">
+<span>
+<i>1</i>Connect</span>
+<b>→</b>
+<span>
+<i>2</i>Cancel</span>
+<b>→</b>
+<span>
+<i>3</i>Inspect</span>
+</div>
+</div>
+<pre id="response-text" hidden>
+</pre>
+</div>
+<div class="console-footer">
+<span id="preview-note">Response preview stays in this page only</span>
+<span id="browser-counts">0 chunks · 0 B</span>
+</div>
+</section>
+<div id="result-callout" class="result-callout">
+<span id="result-icon" aria-hidden="true">◌</span>
+<div>
+<h2 id="result-title">A useful profile starts with your endpoint.</h2>
+<p id="result-description">Nothing runs until you start a profile. Metrics and lifecycle events will appear from the actual request.</p>
+</div>
+</div>
+<section class="card evidence-card" aria-label="Profile evidence">
+<div class="evidence-tabs" role="tablist" aria-label="Evidence views">
+<button id="timeline-tab" role="tab" aria-selected="true" aria-controls="timeline-panel">Timeline <span id="event-count">0</span>
+</button>
+<button id="details-tab" role="tab" aria-selected="false" aria-controls="details-panel" tabindex="-1">Request details</button>
+<span id="report-status" class="report-status">Awaiting a profile</span>
+</div>
+<div id="timeline-panel" role="tabpanel" aria-labelledby="timeline-tab">
+<ol id="timeline" class="timeline" tabindex="0" aria-label="Observed connection events">
+<li class="timeline-empty">Your request's lifecycle will appear here.</li>
+</ol>
+</div>
+<div id="details-panel" role="tabpanel" aria-labelledby="details-tab" hidden>
+<dl id="report-details" class="report-details">
+<div>
+<dt>Endpoint</dt>
+<dd>—</dd>
+</div>
+</dl>
+</div>
+<div class="evidence-footer">
+<span id="cleanup-status">No request in progress</span>
+<span>Provider compute &amp; billing: unobservable</span>
+</div>
+</section>
+<div class="report-actions">
+<span id="report-identity">Private reports are saved automatically.</span>
+<div>
+<button id="open-history" class="button button-text" type="button">Saved profiles</button>
+<button id="export-report" class="button button-subtle" type="button" disabled>
+<span aria-hidden="true">↓</span>Export JSON</button>
+</div>
+</div>
+</div>
+</div>
+<div class="observability-note">
+<span aria-hidden="true">ⓘ</span>
+<p>
+<strong>Connection evidence, not provider promises.</strong> StopLine measures bytes, timing and connection closure at its proxy. It cannot verify internal model computation, generated tokens or provider billing. Response text, prompts and keys are not saved in reports.</p>
+</div>
+</section>
+<section id="history-view" class="view" aria-labelledby="history-heading" hidden>
+<div class="page-heading">
+<div>
+<div class="eyebrow">YOUR PRIVATE WORKSPACE</div>
+<h1 id="history-heading">Saved profiles</h1>
+<p>Reopen the evidence. Compare real runs. Keep your secrets out of reports.</p>
+</div>
+<button id="refresh-history" class="button button-subtle">
+<span aria-hidden="true">↻</span>Refresh</button>
+</div>
+<div class="history-toolbar">
+<span id="history-summary">No saved profiles yet</span>
+<button id="compare-selected" class="button button-subtle" disabled>Compare selected <span id="selected-count">0 / 2</span>
+</button>
+</div>
+<div id="history-list" class="history-list">
+<div class="empty-card">
+<span aria-hidden="true">◷</span>
+<h2>A history of what actually happened.</h2>
+<p>Your first profile will be saved here with timing, byte counts and lifecycle events.</p>
+<button class="button button-primary" data-view="profile">Create a profile <span aria-hidden="true">↗</span>
+</button>
+</div>
+</div>
+<div class="history-footer">
+<p>Reports retain metadata and events. Response bodies, prompts and API keys are not retained. Ordinary endpoint query parameters are included in your private reports.</p>
+<button id="delete-workspace" class="button button-danger-text" disabled>Delete workspace &amp; reports</button>
+</div>
+</section>
+<section id="compare-view" class="view" aria-labelledby="compare-heading" hidden>
+<div class="page-heading">
+<div>
+<div class="eyebrow">SIDE-BY-SIDE EVIDENCE</div>
+<h1 id="compare-heading">Compare actual runs.</h1>
+<p>Inspect the tradeoffs in two saved profiles, without making another request.</p>
+</div>
+</div>
+<div class="compare-selectors">
+<div class="control">
+<label for="compare-a">First profile</label>
+<select id="compare-a">
+<option value="">Choose a saved profile</option>
+</select>
+</div>
+<div class="compare-middle" aria-hidden="true">⇄</div>
+<div class="control">
+<label for="compare-b">Second profile</label>
+<select id="compare-b">
+<option value="">Choose a saved profile</option>
+</select>
+</div>
+</div>
+<div id="comparison" class="comparison">
+<div class="empty-card">
+<span aria-hidden="true">⇄</span>
+<h2>Two runs. A clearer picture.</h2>
+<p>Select two saved profiles above, or select them in your history.</p>
+<button class="button button-subtle" data-view="history">Browse saved profiles</button>
+</div>
+</div>
+<p class="compare-note">Independent requests are not a controlled benchmark. Endpoint load, networks and response content may differ between runs. No provider-work or billing savings are inferred.</p>
+</section>
+<p id="announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true">
+</p>
+<noscript>
+<div class="workspace-message">Enable JavaScript to profile endpoints and access private workspace reports.</div>
+</noscript>
+</main>
+<footer class="app-footer">
+<span>stopline. <span>Measure the boundary.</span>
+</span>
+<span>HTTPS endpoints · Private report history · No API keys retained</span>
+</footer>
+</div>
+<dialog id="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description">
+<form method="dialog">
+<span class="dialog-icon" aria-hidden="true">◇</span>
+<h2 id="delete-title">Delete this report?</h2>
+<p id="delete-description">Its saved metadata and events will be permanently removed from this workspace.</p>
+<div class="dialog-actions">
+<button class="button button-subtle" value="cancel">Keep it</button>
+<button id="confirm-delete" class="button button-danger" type="button">Delete report</button>
+</div>
+</form>
+</dialog>
 </body>
 </html>

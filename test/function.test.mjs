@@ -1,3 +1,6 @@
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import handler, { GET } from '../api/stream.mjs';
@@ -33,7 +36,7 @@ test('pre-aborted requests do not start upstream; network failures return safe e
   } finally { globalThis.fetch = original; }
 });
 async function transportCase(t, { policy, providerBehavior, cancel, beforeFirst = false }) {
-  const original = globalThis.fetch, app = await createApp(); t.after(() => app.close());
+  const dir = await mkdtemp(join(tmpdir(),"stopline-function-")); const original = globalThis.fetch, app = await createApp({dataDir:dir}); t.after(async () => {await app.close();await rm(dir,{recursive:true,force:true});});
   const config = { policy, providerBehavior, totalUnits: 12, intervalMs: 30, initialDelayMs: beforeFirst ? 300 : 30 };
   const created = await original(app.url + '/api/runs', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(config) }); assert.equal(created.status, 201); const run = await created.json();
   // Test-only transport substitution: the handler still chooses its fixed HTTPS URL.

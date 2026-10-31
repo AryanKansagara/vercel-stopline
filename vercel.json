@@ -6,6 +6,30 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/api/profile-runs/:runId/stream",
+      "destination": "/api/stream?runId=:runId&product=1"
+    },
+    {
+      "source": "/api/profile-runs/:runId/export",
+      "destination": "/api/product?route=export&runId=:runId"
+    },
+    {
+      "source": "/api/profile-runs/:runId",
+      "destination": "/api/product?route=run&runId=:runId"
+    },
+    {
+      "source": "/api/profile-runs",
+      "destination": "/api/product?route=runs"
+    },
+    {
+      "source": "/api/workspaces/current",
+      "destination": "/api/product?route=workspace-current"
+    },
+    {
+      "source": "/api/workspaces",
+      "destination": "/api/product?route=workspaces"
+    },
+    {
       "source": "/api/runs/:runId/stream",
       "destination": "/api/stream?runId=:runId"
     },
@@ -51,6 +75,10 @@
   ],
   "functions": {
     "api/stream.mjs": {
+      "supportsCancellation": true,
+      "maxDuration": 30
+    },
+    "api/product.mjs": {
       "supportsCancellation": true,
       "maxDuration": 30
     }
