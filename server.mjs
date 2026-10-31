@@ -196,7 +196,7 @@ export async function createApp({ host = '127.0.0.1', port = 0, webRoot = resolv
         const index = await realpath(resolve(webRoot, 'index.html')).catch(() => null);
         const confined = root && index && !relative(root, index).startsWith('..') && !relative(root, index).startsWith('/');
         const assets = Boolean(confined && await stat(index).then(s => s.isFile() && s.size <= 2 * 1024 * 1024, () => false));
-        return json(response, accepting && assets ? 200 : 503, { ready: accepting && assets, activeJobs: active(), retainedJobs: jobs.size });
+        return json(response, accepting && assets && profiler.ready() ? 200 : 503, { ready: accepting && assets && profiler.ready(), activeJobs: active(), retainedJobs: jobs.size });
       }
       if (await profiler.handle(request, response, rawPath)) return;
       prune();
