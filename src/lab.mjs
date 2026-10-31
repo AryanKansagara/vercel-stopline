@@ -46,7 +46,7 @@ export async function createLab(input = {}) {
     propagatedAborts: 0, proxyErrors: 0, activeProxyRequests: 0,
     providerBackpressure: 0, proxyBackpressure: 0, clientCancelAtMs: null, clientCancelSequence: null,
   };
-  let closed = false;
+  let shutdownPromise;
   function record(kind, data = {}) {
     const event = { sequence: events.length, atMs: +(performance.now() - startedAt).toFixed(3), kind, provenance: 'observed', ...data };
     events.push(event);
@@ -220,7 +220,7 @@ export async function createLab(input = {}) {
         emitter.once('provider-start', ready);
       });
     },
-    async waitForIdle(timeoutMs = 5000) {
+    async waitForIdle(timeoutMs = Math.max(5000, options.initialDelayMs + options.intervalMs * (options.totalUnits - 1) + 1000)) {
       const deadline = performance.now() + timeoutMs;
       while (providerJobs.size || metrics.activeProxyRequests) {
         if (performance.now() >= deadline) throw new Error('Application resources did not settle');
@@ -241,21 +241,26 @@ export async function createLab(input = {}) {
         providerCancellationObserved: metrics.providerCancelled > 0,
       };
     },
-    async close() {
-      if (closed) return;
-      closed = true;
-      for (const c of proxyControllers) c.abort();
-      for (const c of providerControllers) c.abort();
-      const socketClosures = [...sockets].map((socket) => new Promise((resolve) => {
-        if (socket.closed) { sockets.delete(socket); resolve(); return; }
-        socket.once('close', resolve);
-        socket.destroy();
-      }));
-      await Promise.allSettled([...providerJobs]);
-      await Promise.all(socketClosures);
-      await Promise.all([provider, proxy].map((server) => new Promise((resolve) => {
-        server.close(resolve); server.closeAllConnections();
-      })));
+    close() {
+      // All concurrent callers must await the same completed cleanup, not merely
+      // observe that another caller has started shutting down.
+      if (!shutdownPromise) shutdownPromise = (async () => {
+        for (const c of proxyControllers) c.abort();
+        for (const c of providerControllers) c.abort();
+        const socketClosures = [...sockets].map((socket) => new Promise((resolve) => {
+          if (socket.closed) { sockets.delete(socket); resolve(); return; }
+          socket.once('close', resolve);
+          socket.destroy();
+        }));
+        // Stop accepting new connections before the first asynchronous wait.
+        const serverClosures = [provider, proxy].map((server) => new Promise((resolve) => {
+          server.close(resolve); server.closeAllConnections();
+        }));
+        await Promise.allSettled([...providerJobs]);
+        await Promise.all(socketClosures);
+        await Promise.all(serverClosures);
+      })();
+      return shutdownPromise;
     },
   };
   return lab;
