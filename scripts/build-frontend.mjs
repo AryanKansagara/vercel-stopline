@@ -7,4 +7,4 @@ await mkdir(resolve(root, 'dist'));
 for (const name of ['index.html', 'styles.css', 'app.js', 'model.js', 'themes.css', 'theme.js']) {
   await copyFile(resolve(root, 'web', name), resolve(root, 'dist', name));
 }
-console.log('Built static frontend; API requires configured BACKEND_ORIGIN.');
+console.log('Built static frontend; API uses the external rewrites in vercel.json.');
