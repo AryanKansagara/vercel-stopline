@@ -6,6 +6,14 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/app",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/app/",
+      "destination": "/app.html"
+    },
+    {
       "source": "/api/profile-runs/:runId/stream",
       "destination": "/api/stream?runId=:runId&product=1"
     },
