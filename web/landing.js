@@ -12,5 +12,6 @@
  });
  window.addEventListener('storage',event=>{if(event.key===key||event.key===null){try{const value=localStorage.getItem(key);preference=['light','dark'].includes(value)?value:'system';}catch{}apply();const control=document.querySelector('#appearance');if(control)control.value=preference;}});
  // Preserve existing StopLine bookmarks that previously opened a workspace view at /.
- if(root.dataset.product==='stopline'&&['#profile','#history','#compare'].includes(location.hash))location.replace('/app'+location.hash);
+ const openBookmarkedView=()=>{if(root.dataset.product==='stopline'&&['#profile','#history','#compare'].includes(location.hash))location.replace('/app'+location.hash);};
+ openBookmarkedView();window.addEventListener('hashchange',openBookmarkedView);
 })();
